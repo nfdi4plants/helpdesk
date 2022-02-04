@@ -14,7 +14,7 @@ var CONFIG = {
     // The tags to include the generated JS and CSS will be automatically injected in the HTML template
     // See https://github.com/jantimon/html-webpack-plugin
     indexHtmlTemplate: './src/Client/index.html',
-    fsharpEntry: './src/Client/output/App.js',
+    fsharpEntry: './src/Client/App.fs.js',
     outputDir: './deploy/public',
     assetsDir: './src/Client/public',
     devServerPort: 8080,
@@ -31,7 +31,19 @@ var CONFIG = {
             target: 'http://localhost:' + (process.env.SERVER_PROXY_PORT || "8085"),
             ws: true
            }
-       }
+    },
+    babel: {
+        presets: [
+            ['@babel/preset-env', {
+                modules: false,
+                // This adds polyfills when needed. Requires core-js dependency.
+                // See https://babeljs.io/docs/en/babel-preset-env#usebuiltins
+                // Note that you still need to add custom polyfills if necessary (e.g. whatwg-fetch)
+                useBuiltIns: 'usage',
+                corejs: 3
+            }]
+        ],
+    }
 }
 
 // If we're running the webpack-dev-server, assume we're in development mode
@@ -57,19 +69,28 @@ module.exports = {
     entry: {
         app: resolve(CONFIG.fsharpEntry)
     },
+    performance: {
+        hints: false,
+    },
     // Add a hash to the output file name in production
     // to prevent browser caching if code changes
     output: {
         path: resolve(CONFIG.outputDir),
-        filename: isProduction ? '[name].[hash].js' : '[name].js'
+        publicPath: '/',
+        filename: isProduction ? '[name].[fullhash].js' : '[name].js'
     },
     mode: isProduction ? 'production' : 'development',
     devtool: isProduction ? 'source-map' : 'eval-source-map',
     optimization: {
+        runtimeChunk: "single",
+        moduleIds: 'deterministic',
+        // Split the code coming from npm packages into a different file.
+        // 3rd party dependencies change less often, let the browser cache them.
         splitChunks: {
             chunks: 'all'
         },
     },
+    target: ["web", "es5"],
     // Besides the HtmlPlugin, we use the following plugins:
     // PRODUCTION
     //      - MiniCssExtractPlugin: Extracts CSS from bundle to a different file
@@ -79,8 +100,8 @@ module.exports = {
     //      - HotModuleReplacementPlugin: Enables hot reloading when code changes without refreshing
     plugins: isProduction ?
         commonPlugins.concat([
-            new MiniCssExtractPlugin({ filename: 'style.[name].[hash].css' }),
-            new CopyWebpackPlugin({ patterns: [{ from: resolve(CONFIG.assetsDir) }]}),
+            new MiniCssExtractPlugin({ filename: 'style.[name].[fullhash].css' }),
+            new CopyWebpackPlugin({ patterns: [{ from: resolve(CONFIG.assetsDir) }] }),
         ])
         : commonPlugins.concat([
             new webpack.HotModuleReplacementPlugin(),
@@ -91,18 +112,33 @@ module.exports = {
     },
     // Configuration for webpack-dev-server
     devServer: {
-        publicPath: '/',
-        contentBase: resolve(CONFIG.assetsDir),
+        // Necessary when using non-hash client-side routing
+        // This assumes the index.html is accessible from server root
+        // For more info, see https://webpack.js.org/configuration/dev-server/#devserverhistoryapifallback
+        historyApiFallback: true,
         host: '0.0.0.0',
         port: CONFIG.devServerPort,
         proxy: CONFIG.devServerProxy,
-        hot: true,
-        inline: true
+        devMiddleware: {
+            publicPath: CONFIG.publicPath
+        },
+        static: {
+            directory: resolve(CONFIG.assetsDir),
+            publicPath: '/'
+        }
     },
     // - sass-loaders: transforms SASS/SCSS into JS
     // - file-loader: Moves files referenced in the code (fonts, images) into output folder
     module: {
         rules: [
+            {
+                test: /\.m?js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: CONFIG.babel
+                },
+            },
             {
                 test: /\.(sass|scss|css)$/,
                 use: [

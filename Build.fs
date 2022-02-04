@@ -1,19 +1,51 @@
 open Fake.Core
 open Fake.IO
-open Farmer
-open Farmer.Builders
 
 open Helpers
 
 initializeContext()
 
-let sharedPath = Path.getFullName "src/Shared"
-let serverPath = Path.getFullName "src/Server"
-let clientPath = Path.getFullName "src/Client"
+let devUrl = "http://localhost:8080"
+
+let sharedPath = Path.getFullName "src\Shared"
+let serverPath = Path.getFullName "src\Server"
+let clientPath = Path.getFullName "src\Client"
 let deployPath = Path.getFullName "deploy"
 let sharedTestsPath = Path.getFullName "tests/Shared"
 let serverTestsPath = Path.getFullName "tests/Server"
 let clientTestsPath = Path.getFullName "tests/Client"
+
+module ProjectInfo =
+    
+    let gitOwner = "Freymaurer"
+    let gitName = "nfdi-helpdesk"
+
+module ReleaseNoteTasks =
+
+    open Fake.Extensions.Release
+
+    let createAssemblyVersion = Target.create "createvfs" (fun _ ->
+        AssemblyVersion.create ProjectInfo.gitName
+    )
+
+    let updateReleaseNotes = Target.create "release" (fun config ->
+        Release.exists()
+
+        Release.update(ProjectInfo.gitOwner, ProjectInfo.gitName, config)
+
+        let newRelease = ReleaseNotes.load "RELEASE_NOTES.md"
+        
+        let releaseDate =
+            if newRelease.Date.IsSome then newRelease.Date.Value.ToShortDateString() else "WIP"
+        
+        Fake.DotNet.AssemblyInfoFile.createFSharp  "src/Server/Version.fs"
+            [   Fake.DotNet.AssemblyInfo.Title "nfdi-helpdesk"
+                Fake.DotNet.AssemblyInfo.Version newRelease.AssemblyVersion
+                Fake.DotNet.AssemblyInfo.Metadata ("ReleaseDate",releaseDate)
+            ]
+
+        Trace.trace "Update Version.fs done!"
+    )
 
 Target.create "Clean" (fun _ ->
     Shell.cleanDir deployPath
@@ -28,25 +60,12 @@ Target.create "Bundle" (fun _ ->
     |> runParallel
 )
 
-Target.create "Azure" (fun _ ->
-    let web = webApp {
-        name "nfdi_helpdesk"
-        zip_deploy "deploy"
-    }
-    let deployment = arm {
-        location Location.WestEurope
-        add_resource web
-    }
-
-    deployment
-    |> Deploy.execute "nfdi_helpdesk" Deploy.NoParameters
-    |> ignore
-)
-
+// https://github.com/MangelMaxime/fulma-demo/blob/master/build.fsx
 Target.create "Run" (fun _ ->
     run dotnet "build" sharedPath
+    openBrowser devUrl
     [ "server", dotnet "watch run" serverPath
-      "client", dotnet "fable watch -o output -s --run webpack-dev-server" clientPath ]
+      "client", dotnet "fable watch src/Client -s --run webpack serve" "" ]
     |> runParallel
 )
 
@@ -67,7 +86,6 @@ let dependencies = [
     "Clean"
         ==> "InstallClient"
         ==> "Bundle"
-        ==> "Azure"
 
     "Clean"
         ==> "InstallClient"
