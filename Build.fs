@@ -24,9 +24,9 @@ module ReleaseNoteTasks =
 
     open Fake.Extensions.Release
 
-    let createAssemblyVersion = Target.create "createvfs" (fun _ ->
-        AssemblyVersion.create ProjectInfo.gitName
-    )
+    //let createAssemblyVersion = Target.create "createvfs" (fun _ ->
+    //    AssemblyVersion.create ProjectInfo.gitName
+    //)
 
     let updateReleaseNotes = Target.create "release" (fun config ->
         Release.exists()
@@ -93,6 +93,8 @@ let dependencies = [
 
     "InstallClient"
         ==> "RunTests"
+
+    "release"
 ]
 
 [<EntryPoint>]

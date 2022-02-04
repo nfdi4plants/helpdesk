@@ -1,3 +1,8 @@
+### 0.1.0+67f0b55 (Released 2022-2-4)
+* Additions:
+    * latest commit #67f0b55
+    * [[#67f0b55](https://github.com/Freymaurer/nfdi-helpdesk/commit/67f0b55fa467b920ed3ba4ab0e15112f77a5b03c)] Update dependencies :arrow_up:
+
 ### 0.0.0+005de3e (Released 2022-2-4)
 * Additions:
     * latest commit #005de3e
