@@ -3,6 +3,7 @@ framework: net5.0
 storage: none
 
 nuget Fable.Remoting.Giraffe
+nuget Feliz.Bulma.Checkradio
 nuget FSharp.Core 5.0.2
 nuget Microsoft.AspNetCore.Authentication.JwtBearer 5.0.13
 nuget Saturn

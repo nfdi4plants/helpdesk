@@ -65,7 +65,7 @@ Target.create "Run" (fun _ ->
     run dotnet "build" sharedPath
     openBrowser devUrl
     [ "server", dotnet "watch run" serverPath
-      "client", dotnet "fable watch src/Client -s --run webpack serve" "" ]
+      "client", dotnet "fable watch src/Client -s --run webpack-dev-server" "" ]
     |> runParallel
 )
 

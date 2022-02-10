@@ -15,8 +15,6 @@
         "file-loader": "^6.2.0",
         "html-webpack-plugin": "^5.5.0",
         "mini-css-extract-plugin": "^2.4.5",
-        "react": "^17.0.2",
-        "react-dom": "^17.0.2",
         "remotedev": "^0.2.9",
         "sass": "^1.43.4",
         "sass-loader": "^12.3.0",
@@ -27,11 +25,14 @@
         "webpack-dev-server": "^4.5.0"
     },
     "dependencies": {
+        "@nfdi4plants/web-components": "^0.0.2-alpha05",
         "bulma": "^0.9.3",
-        "bulma-checkradio": "^2.1.0",
+        "bulma-checkradio": "^1.1.1",
         "bulma-slider": "^2.0.0",
         "bulma-switch": "^2.0.0",
         "bulma-tooltip": "^3.0.0",
-        "human-readable-ids": "^1.0.4"
+        "human-readable-ids": "^1.0.4",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2"
     }
 }
