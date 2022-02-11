@@ -672,11 +672,44 @@ body {
 }
 
 .details-card p{
-    font-size: 1.5 em !important;
+    font-size: 1.5em !important;
     margin-bottom: 0.5em!important;
 }
 
 .card-container {
     max-width: 70%;
     margin: 0 auto;
+}
+
+.dropdown-item .nested-dropdown {
+    display: none;
+    position: absolute;
+    left: 100%;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 0.5em 1em -0.125em rgb(0 0 0 / 10%), 0 0px 0 1px rgb(0 0 0 / 2%);
+    /*padding: 0.5rem 0px;*/
+    margin: 0px 1px
+}
+
+.dropdown-content .dropdown-item:nth-child(n+4) .nested-dropdown {
+    bottom: 0;
+}
+
+.dropdown-content .dropdown-item:nth-child(-n+3) .nested-dropdown {
+    top: 0;
+}
+
+
+.dropdown-item:hover .nested-dropdown {
+    display: block
+}
+
+.nested-dropdown div {
+    font-size: 0.875rem;
+    padding: 0.375rem 1rem
+}
+
+.nested-dropdown div:hover {
+    background-color: whitesmoke
 }

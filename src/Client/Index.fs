@@ -7,7 +7,7 @@ open Shared
 open State
 
 let init () : Model * Cmd<Msg> =
-    let model = { Todos = []; Input = "" }
+    let model = { Todos = []; Input = ""; FormModel = FormModel.init(); DropdownIsActive = false }
 
     let cmd =
         Cmd.OfAsync.perform todosApi.getTodos () GotTodos
@@ -29,6 +29,11 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         { model with
               Todos = model.Todos @ [ todo ] },
         Cmd.none
+    | ToggleIssueCategoryDropdown ->
+        { model with
+            DropdownIsActive = not model.DropdownIsActive },
+        Cmd.none
+        
 
 open Feliz
 open Feliz.Bulma

@@ -8,11 +8,87 @@ open IssueTypes
 open Feliz
 open Feliz.Bulma
 
+module ButtonDropdown =
+
+    let subcategories (model:Model) (block: IssueTypes.IssueCategory) =
+        let subcategories = block.subcategories
+        Html.div [
+            prop.className "nested-dropdown"
+            prop.children [
+                for subC in subcategories do
+                    let subCText =
+                       match subC with
+                       | IssueSubcategory.RDM rdm -> rdm.toString
+                       | _ -> ""
+                    yield Html.div subCText
+            ]
+        ]
+        
+    let createDropdownItem (model:Model) (dispatch:Msg -> unit) (block: IssueTypes.IssueCategory)  =
+        Bulma.dropdownItem.a [
+            prop.style [style.paddingRight(length.rem 1)]
+            prop.children [      
+                Html.span [
+                    prop.style [
+                        style.display.flex
+                        style.flexGrow 1
+                        style.alignItems.center
+                    ]
+                    prop.children [
+                        Html.span [
+                            prop.style [style.marginRight(length.rem 1.5)]
+                            prop.text block.toString
+                        ]
+                        /// 'Other' has no subcategory
+                        if block <> IssueCategory.Other then
+                            Html.i [
+                                prop.style [
+                                    style.custom("margin-left","auto")
+                                ]
+                                prop.className "fa-solid fa-angle-right"
+                            ]
+                    ]
+                ]
+                subcategories model IssueCategory.RDM
+            ]
+        ]
+
+    let createDropdown (model:Model) (dispatch:Msg -> unit) =
+        Bulma.control.div [
+            Bulma.dropdown [
+                if model.DropdownIsActive then Bulma.dropdown.isActive
+                prop.children [
+                    Bulma.dropdownTrigger [
+                        Bulma.button.a [
+                            prop.onClick (fun e -> e.stopPropagation(); dispatch ToggleIssueCategoryDropdown)
+                            prop.children [
+                                Html.span [
+                                    prop.style [style.marginRight (length.px 5)]
+                                    prop.text ("please select")
+                                ]
+                                Html.i [ prop.className "fa-solid fa-angle-down" ]
+                            ]
+                        ]
+                    ]
+                    Bulma.dropdownMenu [
+                        Bulma.dropdownContent [
+                            createDropdownItem model dispatch IssueCategory.RDM
+                            createDropdownItem model dispatch IssueCategory.Infrastructure
+                            createDropdownItem model dispatch IssueCategory.Metadata
+                            createDropdownItem model dispatch IssueCategory.Tools
+                            createDropdownItem model dispatch IssueCategory.Workflows
+                            Bulma.dropdownDivider []
+                            createDropdownItem model dispatch IssueCategory.Other
+                        ]
+                    ]
+                ]
+            ]
+        ]
 
 let header =
     Bulma.content [
         prop.style [
-            style.backgroundColor "whitesmoke"
+            style.backgroundColor NFDIColors.lightgray
             style.padding (length.rem 1, length.rem 2)
         ]
         prop.children [
@@ -86,7 +162,7 @@ let requestTypeElement =
         ]
     ]
 
-let titleInputElement =
+let titleInputElement model dispatch =
     Bulma.content [
         Bulma.box [
             Bulma.label [
@@ -99,12 +175,8 @@ let titleInputElement =
             Bulma.field.div [
                 field.hasAddons
                 prop.children [
-                    Bulma.control.p [
-                        Bulma.button.button [
-                            button.isStatic
-                            prop.text "[Question]"
-                        ]
-                    ]
+                    /// This is the dropdown button menu
+                    ButtonDropdown.createDropdown model dispatch
                     Bulma.control.p [
                         control.isExpanded
                         prop.children [
@@ -180,9 +252,13 @@ let subcategoryDropdown =
 
 let mainElement (model: Model) (dispatch: Msg -> unit) =
     Bulma.container [
-        header
-        requestTypeElement
-        titleInputElement
-        descriptionElement
-        categoryCheckradiosElement
+        prop.style [
+            //style.backgroundColor "whitesmoke"
+        ]
+        prop.children [
+            header
+            requestTypeElement
+            titleInputElement model dispatch
+            descriptionElement
+        ]
     ]

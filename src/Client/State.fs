@@ -6,13 +6,24 @@ open Shared
 
 type FormModel = {
     IssueType : IssueTypes.IssueType
-    IssueCategories : IssueTypes.IssueCategory
-    IssueSubcategory : IssueTypes.IssueSubcategory
+    IssueCategory : IssueTypes.IssueCategory option
+    IssueSubcategory : IssueTypes.IssueSubcategory option
+} with
+    static member init() = {
+        IssueType           = IssueTypes.Question
+        IssueCategory       = None
+        IssueSubcategory    = None
+    }
+
+type Model = {
+    DropdownIsActive: bool
+    FormModel: FormModel
+    Todos: Todo list;
+    Input: string
 }
 
-type Model = { Todos: Todo list; Input: string }
-
 type Msg =
+    | ToggleIssueCategoryDropdown
     | GotTodos of Todo list
     | SetInput of string
     | AddTodo
