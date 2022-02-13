@@ -6,28 +6,31 @@ open Shared
 
 type FormModel = {
     IssueType : IssueTypes.IssueType
-    IssueCategory : IssueTypes.IssueCategory option
-    IssueSubcategory : IssueTypes.IssueSubcategory option
+    /// Contains Category and Subcategory
+    IssueTopic : IssueTypes.IssueTopic option
+    IssueTitle : string
+    IssueContent: string
+    /// If the user wants updated on their issue, they can give us their email
+    Email: string
 } with
     static member init() = {
-        IssueType           = IssueTypes.Question
-        IssueCategory       = None
-        IssueSubcategory    = None
+        IssueType = IssueTypes.Question
+        IssueTopic = None
+        IssueTitle = ""
+        IssueContent = ""
+        Email = ""
     }
 
 type Model = {
     DropdownIsActive: bool
     FormModel: FormModel
-    Todos: Todo list;
-    Input: string
 }
 
 type Msg =
+    // UI
     | ToggleIssueCategoryDropdown
-    | GotTodos of Todo list
-    | SetInput of string
-    | AddTodo
-    | AddedTodo of Todo
+    // Form input
+    | UpdateFormModel of FormModel
 
 let todosApi =
     Remoting.createApi ()

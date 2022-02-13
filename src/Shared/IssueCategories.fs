@@ -1,11 +1,17 @@
-module IssueTypes
+module rec IssueTypes
 
 type IssueType =
 | Question
 | Bug
 | Request
+    static member ofString(str) =
+        match str with
+        | "Question"    -> IssueType.Question
+        | "Bug"         -> IssueType.Bug
+        | "Request"     -> IssueType.Request
+        | anythingElse  -> failwith $"Unable to parse '{anythingElse}' to IssueType."
 
-module Subcategories =
+module IssueSubcategories =
 
     type RDM =
     | DataSecurity
@@ -70,7 +76,7 @@ module Subcategories =
         member this.toString =
             match this with
             | CWL       -> "CWL"
-            | Galaxy    -> "Galacy"
+            | Galaxy    -> "Galaxy"
             | More      -> "More"
 
     type Metadata =
@@ -85,17 +91,36 @@ module Subcategories =
             | SwateTemplate     -> "Swate Template"
             | More              -> "More"
 
-
-[<RequireQualifiedAccess>]
-type IssueSubcategory =
+/// This should be the main type for working with issue categories
+type IssueTopic =
 /// Research Data Management
-| RDM of Subcategories.RDM
-| Infrastructure of Subcategories.Infrastructure
-| Tools of Subcategories.Tools
-| Workflows of Subcategories.Workflows
-| Metadata of Subcategories.Metadata
+| RDM of IssueSubcategories.RDM
+| Infrastructure of IssueSubcategories.Infrastructure
+| Tools of IssueSubcategories.Tools
+| Workflows of IssueSubcategories.Workflows
+| Metadata of IssueSubcategories.Metadata
 | Other
 
+    member this.toSubCategoryString =
+        match this with
+        | RDM rdm -> rdm.toString
+        | Infrastructure i -> i.toString
+        | Tools t -> t.toString
+        | Workflows w -> w.toString
+        | Metadata m -> m.toString
+        | Other -> IssueCategory.Other.toString
+
+    member this.toCategoryString =
+        match this with
+        | RDM _             -> IssueCategory.RDM.toString
+        | Infrastructure _  -> IssueCategory.Infrastructure.toString
+        | Tools _           -> IssueCategory.Tools.toString
+        | Workflows _       -> IssueCategory.Workflows.toString
+        | Metadata _        -> IssueCategory.Metadata.toString
+        | Other             -> IssueCategory.Other.toString
+
+/// Use this type only to create elements
+[<RequireQualifiedAccess>]
 type IssueCategory =
 /// Research Data Management
 | RDM
@@ -129,42 +154,42 @@ with
         match this with
         | RDM ->
             [|
-                IssueSubcategory.RDM Subcategories.RDM.AnnotationPrinciples
-                IssueSubcategory.RDM Subcategories.RDM.ARCStructure
-                IssueSubcategory.RDM Subcategories.RDM.DataLiteracy
-                IssueSubcategory.RDM Subcategories.RDM.DataSecurity
-                IssueSubcategory.RDM Subcategories.RDM.Teaching
-                IssueSubcategory.RDM Subcategories.RDM.More
+                IssueTopic.RDM IssueSubcategories.RDM.AnnotationPrinciples
+                IssueTopic.RDM IssueSubcategories.RDM.ARCStructure
+                IssueTopic.RDM IssueSubcategories.RDM.DataLiteracy
+                IssueTopic.RDM IssueSubcategories.RDM.DataSecurity
+                IssueTopic.RDM IssueSubcategories.RDM.Teaching
+                IssueTopic.RDM IssueSubcategories.RDM.More
             |]
         | Infrastructure ->
             [|
-                IssueSubcategory.Infrastructure Subcategories.Infrastructure.GitLab
-                IssueSubcategory.Infrastructure Subcategories.Infrastructure.InfrastructureCode
-                IssueSubcategory.Infrastructure Subcategories.Infrastructure.Invenio
-                IssueSubcategory.Infrastructure Subcategories.Infrastructure.MetadataRegistry
-                IssueSubcategory.Infrastructure Subcategories.Infrastructure.RegistrationLogin
-                IssueSubcategory.Infrastructure Subcategories.Infrastructure.More
+                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.GitLab
+                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.InfrastructureCode
+                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.Invenio
+                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.MetadataRegistry
+                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.RegistrationLogin
+                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.More
             |]
         | Tools ->
             [|
-                IssueSubcategory.Tools Subcategories.Tools.ARCCommander
-                IssueSubcategory.Tools Subcategories.Tools.Converters
-                IssueSubcategory.Tools Subcategories.Tools.DMPGenerator
-                IssueSubcategory.Tools Subcategories.Tools.Swate
-                IssueSubcategory.Tools Subcategories.Tools.Swobup
-                IssueSubcategory.Tools Subcategories.Tools.More
+                IssueTopic.Tools IssueSubcategories.Tools.ARCCommander
+                IssueTopic.Tools IssueSubcategories.Tools.Converters
+                IssueTopic.Tools IssueSubcategories.Tools.DMPGenerator
+                IssueTopic.Tools IssueSubcategories.Tools.Swate
+                IssueTopic.Tools IssueSubcategories.Tools.Swobup
+                IssueTopic.Tools IssueSubcategories.Tools.More
             |]
         | Workflows ->
             [|
-                IssueSubcategory.Workflows Subcategories.Workflows.CWL
-                IssueSubcategory.Workflows Subcategories.Workflows.Galaxy
-                IssueSubcategory.Workflows Subcategories.Workflows.More
+                IssueTopic.Workflows IssueSubcategories.Workflows.CWL
+                IssueTopic.Workflows IssueSubcategories.Workflows.Galaxy
+                IssueTopic.Workflows IssueSubcategories.Workflows.More
             |]
         | Metadata ->
             [|
-                IssueSubcategory.Metadata Subcategories.Metadata.SwateTemplate
-                IssueSubcategory.Metadata Subcategories.Metadata.OntologyUpdate
-                IssueSubcategory.Metadata Subcategories.Metadata.More
+                IssueTopic.Metadata IssueSubcategories.Metadata.SwateTemplate
+                IssueTopic.Metadata IssueSubcategories.Metadata.OntologyUpdate
+                IssueTopic.Metadata IssueSubcategories.Metadata.More
             |]
         | Other ->
             [||]
@@ -177,4 +202,3 @@ with
     //    | Workflows w       -> if w.IsNone then this.toString else $"{this.toString} {w.Value.toString}" 
     //    | Metadata m        -> if m.IsNone then this.toString else $"{this.toString} {m.Value.toString}" 
     //    | Other             -> "Other"
-        

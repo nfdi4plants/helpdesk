@@ -7,31 +7,23 @@ open Shared
 open State
 
 let init () : Model * Cmd<Msg> =
-    let model = { Todos = []; Input = ""; FormModel = FormModel.init(); DropdownIsActive = false }
-
-    let cmd =
-        Cmd.OfAsync.perform todosApi.getTodos () GotTodos
-
-    model, cmd
+    let model = {
+        DropdownIsActive = false
+        FormModel = FormModel.init();
+    }
+    model, Cmd.none
 
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg with
-    | GotTodos todos -> { model with Todos = todos }, Cmd.none
-    | SetInput value -> { model with Input = value }, Cmd.none
-    | AddTodo ->
-        let todo = Todo.create model.Input
-
-        let cmd =
-            Cmd.OfAsync.perform todosApi.addTodo todo AddedTodo
-
-        { model with Input = "" }, cmd
-    | AddedTodo todo ->
-        { model with
-              Todos = model.Todos @ [ todo ] },
-        Cmd.none
+    // UI
     | ToggleIssueCategoryDropdown ->
         { model with
             DropdownIsActive = not model.DropdownIsActive },
+        Cmd.none
+    // Form input
+    | UpdateFormModel nextFormModel ->
+        { model with
+            FormModel = nextFormModel },
         Cmd.none
         
 
@@ -55,11 +47,9 @@ let navBrand =
 let view (model: Model) (dispatch: Msg -> unit) =
     Bulma.hero [
         hero.isFullHeight
-        prop.style [
-            //style.backgroundSize "cover"
-            //style.backgroundImageUrl "https://unsplash.it/1200/900?random"
-            //style.backgroundPosition "no-repeat center center fixed"
-        ]
+        prop.onClick(fun e ->
+            if model.DropdownIsActive then dispatch ToggleIssueCategoryDropdown
+        )
         prop.children [
             Bulma.heroHead [
                 nfdi_webcomponents.nfdiNavbar [] []
@@ -75,5 +65,6 @@ let view (model: Model) (dispatch: Msg -> unit) =
                     ]
                 ]
             ]
+            nfdi_webcomponents.nfdiFooter [] []
         ]
     ]
