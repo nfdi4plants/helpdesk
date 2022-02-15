@@ -142,19 +142,24 @@ module ButtonDropdown =
                                 prop.onKeyDown(fun (e:Browser.Types.KeyboardEvent) ->
                                     match e.which with
                                     // Enter
+                                    // open dropdown with enter
                                     | 13. when not model.DropdownIsActive -> e.preventDefault(); dispatch ToggleIssueCategoryDropdown
                                     // Tab
+                                    // close dropdown with tab
                                     | 9. when model.DropdownIsActive -> e.preventDefault(); dispatch ToggleIssueCategoryDropdown
                                     // left
+                                    // navigate from subtopic to topic
                                     | 37. when model.DropdownActiveSubtopic.IsSome ->
                                         e.preventDefault()
                                         UpdateDropdownActiveSubtopic (None) |> dispatch
                                     // arrow up
+                                    // navigate subtopics
                                     | 38. when model.DropdownActiveSubtopic.IsSome ->
                                         e.preventDefault()
                                         let list = model.DropdownActiveTopic.Value.subcategories
                                         let next = findPreviousTopicIndec model.DropdownActiveSubtopic list |> fun ind -> list.[ind]
                                         Msg.UpdateDropdownActiveSubtopic (Some next) |> dispatch
+                                    // navigate topics
                                     | 38. ->
                                         e.preventDefault()
                                         let next = findPreviousTopicIndec model.DropdownActiveTopic topicList |> fun ind -> topicList.[ind]
@@ -169,10 +174,12 @@ module ButtonDropdown =
                                                 IssueTopic = Some IssueTopic.Other
                                         }
                                         UpdateFormModel nextModel |> dispatch
+                                    // Start navigating in subtopics on all other topics with enter or arrow-right when focused
                                     | 39. | 13. when model.DropdownActiveSubtopic = None ->
                                         e.preventDefault()
                                         let st = model.DropdownActiveTopic.Value.subcategories.[0]
                                         UpdateDropdownActiveSubtopic (Some st) |> dispatch
+                                    // Select subtopic with enter or arrow-right when focused
                                     | 39. | 13. when model.DropdownActiveSubtopic.IsSome ->
                                         e.preventDefault()
                                         ToggleIssueCategoryDropdown |> dispatch
@@ -182,11 +189,13 @@ module ButtonDropdown =
                                         }
                                         UpdateFormModel nextModel |> dispatch
                                     // arrow down
+                                    // navigate subtopics
                                     | 40. when model.DropdownActiveSubtopic.IsSome ->
                                         e.preventDefault()
                                         let list = model.DropdownActiveTopic.Value.subcategories
                                         let next = findNextTopicIndex model.DropdownActiveSubtopic list |> fun ind -> list.[ind]
                                         Msg.UpdateDropdownActiveSubtopic (Some next) |> dispatch
+                                    // navigate topics
                                     | 40. ->
                                         e.preventDefault()
                                         let prev = findNextTopicIndex model.DropdownActiveTopic topicList |> fun ind -> topicList.[ind]
