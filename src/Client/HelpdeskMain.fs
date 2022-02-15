@@ -9,12 +9,23 @@ open IssueTypes
 open Feliz
 open Feliz.Bulma
 
+let topicList = [
+    IssueCategory.RDM
+    IssueCategory.Infrastructure
+    IssueCategory.Metadata
+    IssueCategory.Tools
+    IssueCategory.Workflows
+    IssueCategory.Other
+]
+
 module ButtonDropdown =
 
     let subcategories (model:Model) dispatch (block: IssueTypes.IssueCategory) =
         let subcategories = block.subcategories
+        let isActive = model.DropdownActiveTopic = Some block
         Html.div [
             prop.className "nested-dropdown"
+            prop.style [if isActive then style.display.block]
             prop.children [
                 for topic in subcategories do
                     let subCText =
@@ -28,6 +39,11 @@ module ButtonDropdown =
                        | other -> failwith $"Could not match {other} with issue subcategories."
                     yield
                         Html.div [
+                            prop.style [
+                                if model.DropdownActiveSubtopic = Some topic then
+                                    style.backgroundColor NFDIColors.LightBlue.Base
+                                    style.color "white"
+                            ]
                             prop.onClick (fun e ->
                                 // prevent main element "dropdwon toggle"
                                 e.stopPropagation()
@@ -45,7 +61,10 @@ module ButtonDropdown =
         
     let createDropdownItem (model:Model) (dispatch:Msg -> unit) (block: IssueTypes.IssueCategory)  =
         Bulma.dropdownItem.a [
+            if model.DropdownActiveTopic = Some block then Bulma.dropdownItem.isActive
             prop.style [style.paddingRight(length.rem 1)]
+            prop.onMouseOver(fun _ -> Msg.UpdateDropdownActiveTopic (Some block) |> dispatch)
+            prop.onMouseOut(fun _ -> Msg.UpdateDropdownActiveTopic (None) |> dispatch)
             prop.onClick(fun e ->
                 // prevent main element "dropdwon toggle"
                 e.stopPropagation()
@@ -91,6 +110,18 @@ module ButtonDropdown =
             ]
         ]
 
+    let private findCurrentTopicIndex (item: 'a option) (itemList: 'a seq) =
+        // start at -1 if isNone to show index 0 item next
+        if item.IsNone then -1 else itemList |> Seq.findIndex (fun x -> x = item.Value)
+
+    let private findNextTopicIndex (item: 'a option) (itemList: 'a seq) =
+        let current = findCurrentTopicIndex item itemList
+        if current >= (Seq.length itemList - 1) then Seq.length itemList - 1 else current + 1
+
+    let private findPreviousTopicIndec (item: 'a option) (itemList: 'a seq) =
+        let current = findCurrentTopicIndex item itemList
+        if current <= 0 then 0 else current - 1
+
     let createDropdown (model:Model) (dispatch:Msg -> unit) =
         Bulma.control.div [
             prop.children [
@@ -99,6 +130,7 @@ module ButtonDropdown =
                     prop.children [
                         Bulma.dropdownTrigger [
                             Bulma.button.a [
+                                prop.tabIndex 0
                                 let title =
                                     if model.FormModel.IssueTopic.IsNone then
                                         "Choose a topic"
@@ -106,6 +138,61 @@ module ButtonDropdown =
                                         $"{model.FormModel.IssueTopic.Value.toCategoryString} > {model.FormModel.IssueTopic.Value.toSubCategoryString}"
                                 prop.title title
                                 prop.onClick (fun e -> e.stopPropagation(); dispatch ToggleIssueCategoryDropdown)
+                                // keyboard navigation
+                                prop.onKeyDown(fun (e:Browser.Types.KeyboardEvent) ->
+                                    match e.which with
+                                    // Enter
+                                    | 13. when not model.DropdownIsActive -> e.preventDefault(); dispatch ToggleIssueCategoryDropdown
+                                    // Tab
+                                    | 9. when model.DropdownIsActive -> e.preventDefault(); dispatch ToggleIssueCategoryDropdown
+                                    // left
+                                    | 37. when model.DropdownActiveSubtopic.IsSome ->
+                                        e.preventDefault()
+                                        UpdateDropdownActiveSubtopic (None) |> dispatch
+                                    // arrow up
+                                    | 38. when model.DropdownActiveSubtopic.IsSome ->
+                                        e.preventDefault()
+                                        let list = model.DropdownActiveTopic.Value.subcategories
+                                        let next = findPreviousTopicIndec model.DropdownActiveSubtopic list |> fun ind -> list.[ind]
+                                        Msg.UpdateDropdownActiveSubtopic (Some next) |> dispatch
+                                    | 38. ->
+                                        e.preventDefault()
+                                        let next = findPreviousTopicIndec model.DropdownActiveTopic topicList |> fun ind -> topicList.[ind]
+                                        Msg.UpdateDropdownActiveTopic (Some next) |> dispatch
+                                    // right
+                                    // select other with enter or arrow-right when focused
+                                    | 39. | 13. when model.DropdownActiveTopic = Some IssueCategory.Other ->
+                                        e.preventDefault()
+                                        ToggleIssueCategoryDropdown |> dispatch
+                                        let nextModel = {
+                                            model.FormModel with
+                                                IssueTopic = Some IssueTopic.Other
+                                        }
+                                        UpdateFormModel nextModel |> dispatch
+                                    | 39. | 13. when model.DropdownActiveSubtopic = None ->
+                                        e.preventDefault()
+                                        let st = model.DropdownActiveTopic.Value.subcategories.[0]
+                                        UpdateDropdownActiveSubtopic (Some st) |> dispatch
+                                    | 39. | 13. when model.DropdownActiveSubtopic.IsSome ->
+                                        e.preventDefault()
+                                        ToggleIssueCategoryDropdown |> dispatch
+                                        let nextModel = {
+                                            model.FormModel with
+                                                IssueTopic = Some (model.DropdownActiveSubtopic.Value)
+                                        }
+                                        UpdateFormModel nextModel |> dispatch
+                                    // arrow down
+                                    | 40. when model.DropdownActiveSubtopic.IsSome ->
+                                        e.preventDefault()
+                                        let list = model.DropdownActiveTopic.Value.subcategories
+                                        let next = findNextTopicIndex model.DropdownActiveSubtopic list |> fun ind -> list.[ind]
+                                        Msg.UpdateDropdownActiveSubtopic (Some next) |> dispatch
+                                    | 40. ->
+                                        e.preventDefault()
+                                        let prev = findNextTopicIndex model.DropdownActiveTopic topicList |> fun ind -> topicList.[ind]
+                                        Msg.UpdateDropdownActiveTopic (Some prev) |> dispatch
+                                    | _ -> ()
+                                )
                                 prop.children [
                                     Html.span [
                                         prop.style [style.marginRight (length.px 5)]
@@ -125,13 +212,11 @@ module ButtonDropdown =
                         ]
                         Bulma.dropdownMenu [
                             Bulma.dropdownContent [
-                                createDropdownItem model dispatch IssueCategory.RDM
-                                createDropdownItem model dispatch IssueCategory.Infrastructure
-                                createDropdownItem model dispatch IssueCategory.Metadata
-                                createDropdownItem model dispatch IssueCategory.Tools
-                                createDropdownItem model dispatch IssueCategory.Workflows
-                                Bulma.dropdownDivider []
-                                createDropdownItem model dispatch IssueCategory.Other
+                                /// except other to add divider in between
+                                for topic in topicList |> List.except [IssueCategory.Other] do
+                                    yield createDropdownItem model dispatch topic
+                                yield Bulma.dropdownDivider []
+                                yield createDropdownItem model dispatch IssueCategory.Other
                             ]
                         ]
                     ]
@@ -328,9 +413,21 @@ let captchaANDsubmit (model:Model) dispatch =
                 // Submits
                 Bulma.column [
                     Bulma.button.button [
-                        color.isInfo
+                        prop.onClick (fun _ -> dispatch SubmitIssueRequest)
+                        prop.classes ["is-nfdidark"]
+                        //color.isInfo
                         Bulma.button.isFullWidth
-                        prop.text "Submit"
+                        prop.children [
+                            Html.span "Submit"
+                            Html.span [
+                                prop.classes ["icon is-small"]
+                                prop.children [
+                                    Html.i [
+                                        prop.className "fa-solid fa-share"
+                                    ]
+                                ]
+                            ]
+                        ]
                     ]
                 ]
             ]

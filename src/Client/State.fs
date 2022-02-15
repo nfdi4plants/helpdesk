@@ -3,36 +3,40 @@ module State
 open Elmish
 open Fable.Remoting.Client
 open Shared
-
-type FormModel = {
-    IssueType : IssueTypes.IssueType
-    /// Contains Category and Subcategory
-    IssueTopic : IssueTypes.IssueTopic option
-    IssueTitle : string
-    IssueContent: string
-    /// If the user wants updated on their issue, they can give us their email
-    Email: string
-} with
-    static member init() = {
-        IssueType = IssueTypes.Question
-        IssueTopic = None
-        IssueTitle = ""
-        IssueContent = ""
-        Email = ""
-    }
+open Fable.SimpleJson
 
 type Model = {
     DropdownIsActive: bool
-    FormModel: FormModel
+    DropdownActiveTopic: IssueTypes.IssueCategory option
+    // True when user navigates to nested dropdown
+    DropdownActiveSubtopic: IssueTypes.IssueTopic option
+    FormModel: Form.Model
 }
+
+type System.Exception with
+    member this.GetPropagatedError() =
+        match this with
+        | :? ProxyRequestException as exn ->
+            let response = exn.ResponseText |> Json.parseAs<{| error:string; ignored : bool; handled : bool |}>
+            response.error
+        | ex ->
+            ex.Message
+
+let curry f a b = f(a,b)
 
 type Msg =
     // UI
     | ToggleIssueCategoryDropdown
+    | UpdateDropdownActiveTopic of IssueTypes.IssueCategory option
+    | UpdateDropdownActiveSubtopic of IssueTypes.IssueTopic option
     // Form input
-    | UpdateFormModel of FormModel
+    | UpdateFormModel of Form.Model
+    // API
+    | SubmitIssueRequest
+    | SubmitIssueResponse
+    | GenericError of Cmd<Msg> * exn
 
-let todosApi =
+let api =
     Remoting.createApi ()
     |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.buildProxy<ITodosApi>
+    |> Remoting.buildProxy<IHelpdeskAPI>

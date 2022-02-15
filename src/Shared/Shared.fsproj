@@ -4,7 +4,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="IssueCategories.fs" />
+    <Compile Include="IssueTypes.fs" />
+    <Compile Include="FormModel.fs" />
     <Compile Include="Shared.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

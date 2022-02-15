@@ -7,6 +7,7 @@ $white: white;
 $black: black;
 
 $mint                   : #1fc2a7;
+$mint-invert: findColorInvert($mint);
 
 $mint-darker-10         : #1caf96;
 $mint-darker-20         : #199b86;
@@ -74,7 +75,7 @@ $darkblue-lighter-90    : #eaecee;
 
 $yellow                 : #F9CD69;
 
-$yellow-darker-10       : #e6ad00;
+$yellow-darker-10 : #e6ad00;
 $yellow-darker-20       : #cc9a00;
 $yellow-darker-30       : #b38600;
 $yellow-darker-40       : #997300;
@@ -649,6 +650,8 @@ $red-lighter-90         : #F8E8EB;
 // Bulma overwrites
 
 $link: $lightblue;
+$warning: $yellow;
+
 
 $navbar-item-hover-background-color: $darkblue-lighter-20;
 $navbar-item-color: white;
@@ -657,7 +660,15 @@ $navbar-item-active-color: $lightblue;
 $navbar-item-active-background-color:$darkblue-lighter-20;
 
 
+$custom-colors: (
+    "nfdired": ($red),
+    "nfdimint": ($mint),
+    "nfdiolive": ($olive),
+    "nfdidark": ($darkblue)
+);
+
 @import "../../node_modules/bulma/bulma.sass";
+
 
 body {
     background-color: $white-bis;
@@ -689,7 +700,8 @@ body {
     border-radius: 4px;
     box-shadow: 0 0.5em 1em -0.125em rgb(0 0 0 / 10%), 0 0px 0 1px rgb(0 0 0 / 2%);
     /*padding: 0.5rem 0px;*/
-    margin: 0px 1px
+    margin: 0px 1px;
+    color: black
 }
 
 .dropdown-content .dropdown-item:nth-child(n+4) .nested-dropdown {
@@ -700,16 +712,17 @@ body {
     top: 0;
 }
 
-
-.dropdown-item:hover .nested-dropdown {
+/*sadly not useful for nice keaboard navigation*/
+/*.dropdown-item:hover .nested-dropdown {
     display: block
-}
+}*/
 
 .nested-dropdown div {
     font-size: 0.875rem;
     padding: 0.375rem 1rem
 }
 
-.nested-dropdown div:hover {
+/*sadly not useful for nice keaboard navigation*/
+/*.nested-dropdown div:hover {
     background-color: whitesmoke
-}
+}*/

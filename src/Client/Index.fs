@@ -6,10 +6,13 @@ open Shared
 
 open State
 
+
 let init () : Model * Cmd<Msg> =
     let model = {
         DropdownIsActive = false
-        FormModel = FormModel.init();
+        FormModel = Form.Model.init();
+        DropdownActiveTopic = None
+        DropdownActiveSubtopic = None
     }
     model, Cmd.none
 
@@ -18,13 +21,42 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     // UI
     | ToggleIssueCategoryDropdown ->
         { model with
-            DropdownIsActive = not model.DropdownIsActive },
+            DropdownIsActive = not model.DropdownIsActive
+            DropdownActiveTopic = None
+            DropdownActiveSubtopic = None },
+        Cmd.none
+    | UpdateDropdownActiveTopic next ->
+        { model with
+            DropdownActiveTopic = next },
+        Cmd.none
+    | UpdateDropdownActiveSubtopic next ->
+        { model with
+            DropdownActiveSubtopic = next },
         Cmd.none
     // Form input
     | UpdateFormModel nextFormModel ->
         { model with
             FormModel = nextFormModel },
         Cmd.none
+    // API
+    | SubmitIssueRequest ->
+        let cmd =
+            Cmd.OfAsync.either
+                api.submitIssue
+                    model.FormModel
+                    (fun () -> SubmitIssueResponse)
+                    (curry GenericError Cmd.none)
+        model, cmd
+    | SubmitIssueResponse ->
+        Alerts.submitSuccessfullyAlert()
+        let nextModel = fst <| init()
+        model, Cmd.none
+    | GenericError (nextCmd,exn) ->
+        Alerts.genericErrorAlert(exn)
+        model, nextCmd
+        
+
+        
         
 
 open Feliz
