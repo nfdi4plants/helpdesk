@@ -44,6 +44,8 @@ module ButtonDropdown =
                                     style.backgroundColor NFDIColors.LightBlue.Base
                                     style.color "white"
                             ]
+                            prop.onMouseOver(fun _ -> Msg.UpdateDropdownActiveSubtopic (Some topic) |> dispatch)
+                            prop.onMouseOut(fun _ -> Msg.UpdateDropdownActiveSubtopic (None) |> dispatch)
                             prop.onClick (fun e ->
                                 // prevent main element "dropdwon toggle"
                                 e.stopPropagation()
@@ -177,7 +179,11 @@ module ButtonDropdown =
                                     // Start navigating in subtopics on all other topics with enter or arrow-right when focused
                                     | 39. | 13. when model.DropdownActiveSubtopic = None ->
                                         e.preventDefault()
-                                        let st = model.DropdownActiveTopic.Value.subcategories.[0]
+                                        let st =
+                                            match model.DropdownActiveTopic.Value with
+                                            | uc when uc = IssueCategory.RDM || uc = IssueCategory.Infrastructure || uc = IssueCategory.Metadata -> uc.subcategories.[0]
+                                            | bc when bc = IssueCategory.Tools || bc = IssueCategory.Workflows -> bc.subcategories |> Array.last
+                                            | anythingElse -> failwith $"Could not parse {anythingElse} to keyboard navigation event"
                                         UpdateDropdownActiveSubtopic (Some st) |> dispatch
                                     // Select subtopic with enter or arrow-right when focused
                                     | 39. | 13. when model.DropdownActiveSubtopic.IsSome ->
