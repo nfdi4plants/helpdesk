@@ -2,11 +2,14 @@ source https://api.nuget.org/v3/index.json
 framework: net5.0
 storage: none
 
+nuget Azure.Identity 1.5.0
 nuget Fable.FontAwesome.Free 2.1.0
 nuget Fable.Remoting.Giraffe
 nuget Feliz.Bulma.Checkradio
+nuget Feliz.SweetAlert
 nuget FSharp.Core 5.0.2
 nuget Microsoft.AspNetCore.Authentication.JwtBearer 5.0.13
+nuget Microsoft.Graph
 nuget Saturn
 nuget Expecto
 

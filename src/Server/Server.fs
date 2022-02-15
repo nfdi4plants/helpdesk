@@ -3,46 +3,29 @@ module Server
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 open Saturn
-
 open Shared
 
-type Storage() =
-    let todos = ResizeArray<_>()
 
-    member __.GetTodos() = List.ofSeq todos
+open Shared
+open Microsoft.AspNetCore.Http
 
-    member __.AddTodo(todo: Todo) =
-        if Todo.isValid todo.Description then
-            todos.Add todo
-            Ok()
-        else
-            Error "Invalid todo"
+let api = {
+    submitIssue = fun (formModel) -> async {
+        printfn "%A" formModel
+        return ()
+    }
+}
 
-let storage = Storage()
-
-storage.AddTodo(Todo.create "Create new SAFE project")
-|> ignore
-
-storage.AddTodo(Todo.create "Write your app")
-|> ignore
-
-storage.AddTodo(Todo.create "Ship it !!!")
-|> ignore
-
-let todosApi =
-    { getTodos = fun () -> async { return storage.GetTodos() }
-      addTodo =
-          fun todo ->
-              async {
-                  match storage.AddTodo todo with
-                  | Ok () -> return todo
-                  | Error e -> return failwith e
-              } }
+let errorHandler (ex:exn) (routeInfo:RouteInfo<HttpContext>) =
+    let msg = sprintf "%A %s @%s." ex.Message System.Environment.NewLine routeInfo.path
+    Propagate msg
 
 let webApp =
     Remoting.createApi ()
     |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.fromValue todosApi
+    |> Remoting.fromValue api
+    |> Remoting.withErrorHandler errorHandler
+    |> Remoting.withDiagnosticsLogger(printfn "%A")
     |> Remoting.buildHttpHandler
 
 let app =
