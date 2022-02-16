@@ -10,6 +10,7 @@ open State
 let init () : Model * Cmd<Msg> =
     let model = {
         DropdownIsActive = false
+        LoadingModal = false
         FormModel = Form.Model.init();
         DropdownActiveTopic = None
         DropdownActiveSubtopic = None
@@ -33,6 +34,10 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         { model with
             DropdownActiveSubtopic = next },
         Cmd.none
+    | UpdateLoadingModal isActive ->
+        { model with
+            LoadingModal = isActive },
+        Cmd.none
     // Form input
     | UpdateFormModel nextFormModel ->
         { model with
@@ -40,17 +45,21 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         Cmd.none
     // API
     | SubmitIssueRequest ->
+        let nextModel = {
+            model with
+                LoadingModal = true
+        }
         let cmd =
             Cmd.OfAsync.either
                 api.submitIssue
                     model.FormModel
                     (fun () -> SubmitIssueResponse)
-                    (curry GenericError Cmd.none)
-        model, cmd
+                    (curry GenericError <| Cmd.ofMsg (UpdateLoadingModal false))
+        nextModel, cmd
     | SubmitIssueResponse ->
         Alerts.submitSuccessfullyAlert()
-        let nextModel = fst <| init()
-        model, Cmd.none
+        let nextModel = fst <| init() 
+        {model with LoadingModal = false}, Cmd.none
     | GenericError (nextCmd,exn) ->
         Alerts.genericErrorAlert(exn)
         model, nextCmd
@@ -83,6 +92,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
             if model.DropdownIsActive then dispatch ToggleIssueCategoryDropdown
         )
         prop.children [
+            Modal.loadingModal model dispatch
             Bulma.heroHead [
                 nfdi_webcomponents.nfdiNavbar [] []
             ]

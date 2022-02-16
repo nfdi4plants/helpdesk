@@ -11,7 +11,7 @@ type IssueType =
         | "Request"     -> IssueType.Request
         | anythingElse  -> failwith $"Unable to parse '{anythingElse}' to IssueType."
 
-module IssueSubcategories =
+module IssueSubtopics =
 
     type RDM =
     | DataSecurity
@@ -92,13 +92,13 @@ module IssueSubcategories =
             | More              -> "More"
 
 /// This should be the main type for working with issue categories
-type IssueTopic =
+type Topic =
 /// Research Data Management
-| RDM of IssueSubcategories.RDM
-| Infrastructure of IssueSubcategories.Infrastructure
-| Tools of IssueSubcategories.Tools
-| Workflows of IssueSubcategories.Workflows
-| Metadata of IssueSubcategories.Metadata
+| RDM of IssueSubtopics.RDM
+| Infrastructure of IssueSubtopics.Infrastructure
+| Tools of IssueSubtopics.Tools
+| Workflows of IssueSubtopics.Workflows
+| Metadata of IssueSubtopics.Metadata
 | Other
 
     member this.toSubCategoryString =
@@ -108,20 +108,20 @@ type IssueTopic =
         | Tools t -> t.toString
         | Workflows w -> w.toString
         | Metadata m -> m.toString
-        | Other -> IssueCategory.Other.toString
+        | Other -> IssueGeneralTopic.Other.toString
 
     member this.toCategoryString =
         match this with
-        | RDM _             -> IssueCategory.RDM.toString
-        | Infrastructure _  -> IssueCategory.Infrastructure.toString
-        | Tools _           -> IssueCategory.Tools.toString
-        | Workflows _       -> IssueCategory.Workflows.toString
-        | Metadata _        -> IssueCategory.Metadata.toString
-        | Other             -> IssueCategory.Other.toString
+        | RDM _             -> IssueGeneralTopic.RDM.toString
+        | Infrastructure _  -> IssueGeneralTopic.Infrastructure.toString
+        | Tools _           -> IssueGeneralTopic.Tools.toString
+        | Workflows _       -> IssueGeneralTopic.Workflows.toString
+        | Metadata _        -> IssueGeneralTopic.Metadata.toString
+        | Other             -> IssueGeneralTopic.Other.toString
 
 /// Use this type only to create elements
 [<RequireQualifiedAccess>]
-type IssueCategory =
+type IssueGeneralTopic =
 /// Research Data Management
 | RDM
 | Infrastructure   
@@ -154,42 +154,42 @@ with
         match this with
         | RDM ->
             [|
-                IssueTopic.RDM IssueSubcategories.RDM.AnnotationPrinciples
-                IssueTopic.RDM IssueSubcategories.RDM.ARCStructure
-                IssueTopic.RDM IssueSubcategories.RDM.DataLiteracy
-                IssueTopic.RDM IssueSubcategories.RDM.DataSecurity
-                IssueTopic.RDM IssueSubcategories.RDM.Teaching
-                IssueTopic.RDM IssueSubcategories.RDM.More
+                Topic.RDM IssueSubtopics.RDM.AnnotationPrinciples
+                Topic.RDM IssueSubtopics.RDM.ARCStructure
+                Topic.RDM IssueSubtopics.RDM.DataLiteracy
+                Topic.RDM IssueSubtopics.RDM.DataSecurity
+                Topic.RDM IssueSubtopics.RDM.Teaching
+                Topic.RDM IssueSubtopics.RDM.More
             |]
         | Infrastructure ->
             [|
-                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.GitLab
-                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.InfrastructureCode
-                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.Invenio
-                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.MetadataRegistry
-                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.RegistrationLogin
-                IssueTopic.Infrastructure IssueSubcategories.Infrastructure.More
+                Topic.Infrastructure IssueSubtopics.Infrastructure.GitLab
+                Topic.Infrastructure IssueSubtopics.Infrastructure.InfrastructureCode
+                Topic.Infrastructure IssueSubtopics.Infrastructure.Invenio
+                Topic.Infrastructure IssueSubtopics.Infrastructure.MetadataRegistry
+                Topic.Infrastructure IssueSubtopics.Infrastructure.RegistrationLogin
+                Topic.Infrastructure IssueSubtopics.Infrastructure.More
             |]
         | Tools ->
             [|
-                IssueTopic.Tools IssueSubcategories.Tools.ARCCommander
-                IssueTopic.Tools IssueSubcategories.Tools.Converters
-                IssueTopic.Tools IssueSubcategories.Tools.DMPGenerator
-                IssueTopic.Tools IssueSubcategories.Tools.Swate
-                IssueTopic.Tools IssueSubcategories.Tools.Swobup
-                IssueTopic.Tools IssueSubcategories.Tools.More
+                Topic.Tools IssueSubtopics.Tools.ARCCommander
+                Topic.Tools IssueSubtopics.Tools.Converters
+                Topic.Tools IssueSubtopics.Tools.DMPGenerator
+                Topic.Tools IssueSubtopics.Tools.Swate
+                Topic.Tools IssueSubtopics.Tools.Swobup
+                Topic.Tools IssueSubtopics.Tools.More
             |]
         | Workflows ->
             [|
-                IssueTopic.Workflows IssueSubcategories.Workflows.CWL
-                IssueTopic.Workflows IssueSubcategories.Workflows.Galaxy
-                IssueTopic.Workflows IssueSubcategories.Workflows.More
+                Topic.Workflows IssueSubtopics.Workflows.CWL
+                Topic.Workflows IssueSubtopics.Workflows.Galaxy
+                Topic.Workflows IssueSubtopics.Workflows.More
             |]
         | Metadata ->
             [|
-                IssueTopic.Metadata IssueSubcategories.Metadata.SwateTemplate
-                IssueTopic.Metadata IssueSubcategories.Metadata.OntologyUpdate
-                IssueTopic.Metadata IssueSubcategories.Metadata.More
+                Topic.Metadata IssueSubtopics.Metadata.SwateTemplate
+                Topic.Metadata IssueSubtopics.Metadata.OntologyUpdate
+                Topic.Metadata IssueSubtopics.Metadata.More
             |]
         | Other ->
             [||]

@@ -10,17 +10,17 @@ open Feliz
 open Feliz.Bulma
 
 let topicList = [
-    IssueCategory.RDM
-    IssueCategory.Infrastructure
-    IssueCategory.Metadata
-    IssueCategory.Tools
-    IssueCategory.Workflows
-    IssueCategory.Other
+    IssueGeneralTopic.RDM
+    IssueGeneralTopic.Infrastructure
+    IssueGeneralTopic.Metadata
+    IssueGeneralTopic.Tools
+    IssueGeneralTopic.Workflows
+    IssueGeneralTopic.Other
 ]
 
 module ButtonDropdown =
 
-    let subcategories (model:Model) dispatch (block: IssueTypes.IssueCategory) =
+    let subcategories (model:Model) dispatch (block: IssueTypes.IssueGeneralTopic) =
         let subcategories = block.subcategories
         let isActive = model.DropdownActiveTopic = Some block
         Html.div [
@@ -30,12 +30,12 @@ module ButtonDropdown =
                 for topic in subcategories do
                     let subCText =
                        match topic with
-                       | IssueTopic.RDM rdm -> rdm.toString
-                       | IssueTopic.Infrastructure i -> i.toString
-                       | IssueTopic.Metadata m -> m.toString
-                       | IssueTopic.Tools t -> t.toString
-                       | IssueTopic.Workflows w -> w.toString
-                       /// This could happen when somehow IssueTopic.Other gets this element created
+                       | Topic.RDM rdm -> rdm.toString
+                       | Topic.Infrastructure i -> i.toString
+                       | Topic.Metadata m -> m.toString
+                       | Topic.Tools t -> t.toString
+                       | Topic.Workflows w -> w.toString
+                       /// This could happen when somehow Topic.Other gets this element created
                        | other -> failwith $"Could not match {other} with issue subcategories."
                     yield
                         Html.div [
@@ -61,7 +61,7 @@ module ButtonDropdown =
             ]
         ]
         
-    let createDropdownItem (model:Model) (dispatch:Msg -> unit) (block: IssueTypes.IssueCategory)  =
+    let createDropdownItem (model:Model) (dispatch:Msg -> unit) (block: IssueTypes.IssueGeneralTopic)  =
         Bulma.dropdownItem.a [
             if model.DropdownActiveTopic = Some block then Bulma.dropdownItem.isActive
             prop.style [style.paddingRight(length.rem 1)]
@@ -72,12 +72,12 @@ module ButtonDropdown =
                 e.stopPropagation()
                 let subMore =
                     match block with
-                    | IssueCategory.RDM                 -> IssueTopic.RDM IssueSubcategories.RDM.More
-                    | IssueCategory.Infrastructure      -> IssueTopic.Infrastructure IssueSubcategories.Infrastructure.More
-                    | IssueCategory.Metadata            -> IssueTopic.Metadata IssueSubcategories.Metadata.More
-                    | IssueCategory.Tools               -> IssueTopic.Tools IssueSubcategories.Tools.More
-                    | IssueCategory.Workflows           -> IssueTopic.Workflows IssueSubcategories.Workflows.More
-                    | IssueCategory.Other               -> IssueTopic.Other
+                    | IssueGeneralTopic.RDM                 -> Topic.RDM IssueSubtopics.RDM.More
+                    | IssueGeneralTopic.Infrastructure      -> Topic.Infrastructure IssueSubtopics.Infrastructure.More
+                    | IssueGeneralTopic.Metadata            -> Topic.Metadata IssueSubtopics.Metadata.More
+                    | IssueGeneralTopic.Tools               -> Topic.Tools IssueSubtopics.Tools.More
+                    | IssueGeneralTopic.Workflows           -> Topic.Workflows IssueSubtopics.Workflows.More
+                    | IssueGeneralTopic.Other               -> Topic.Other
                 ToggleIssueCategoryDropdown |> dispatch
                 let nextModel = {
                     model.FormModel with
@@ -98,7 +98,7 @@ module ButtonDropdown =
                             prop.text block.toString
                         ]
                         /// 'Other' has no subcategory
-                        if block <> IssueCategory.Other then
+                        if block <> IssueGeneralTopic.Other then
                             Html.i [
                                 prop.style [
                                     style.custom("margin-left","auto")
@@ -107,7 +107,7 @@ module ButtonDropdown =
                             ]
                     ]
                 ]
-                if block <> IssueCategory.Other then
+                if block <> IssueGeneralTopic.Other then
                     subcategories model dispatch block
             ]
         ]
@@ -168,12 +168,12 @@ module ButtonDropdown =
                                         Msg.UpdateDropdownActiveTopic (Some next) |> dispatch
                                     // right
                                     // select other with enter or arrow-right when focused
-                                    | 39. | 13. when model.DropdownActiveTopic = Some IssueCategory.Other ->
+                                    | 39. | 13. when model.DropdownActiveTopic = Some IssueGeneralTopic.Other ->
                                         e.preventDefault()
                                         ToggleIssueCategoryDropdown |> dispatch
                                         let nextModel = {
                                             model.FormModel with
-                                                IssueTopic = Some IssueTopic.Other
+                                                IssueTopic = Some Topic.Other
                                         }
                                         UpdateFormModel nextModel |> dispatch
                                     // Start navigating in subtopics on all other topics with enter or arrow-right when focused
@@ -181,8 +181,8 @@ module ButtonDropdown =
                                         e.preventDefault()
                                         let st =
                                             match model.DropdownActiveTopic.Value with
-                                            | uc when uc = IssueCategory.RDM || uc = IssueCategory.Infrastructure || uc = IssueCategory.Metadata -> uc.subcategories.[0]
-                                            | bc when bc = IssueCategory.Tools || bc = IssueCategory.Workflows -> bc.subcategories |> Array.last
+                                            | uc when uc = IssueGeneralTopic.RDM || uc = IssueGeneralTopic.Infrastructure || uc = IssueGeneralTopic.Metadata -> uc.subcategories.[0]
+                                            | bc when bc = IssueGeneralTopic.Tools || bc = IssueGeneralTopic.Workflows -> bc.subcategories |> Array.last
                                             | anythingElse -> failwith $"Could not parse {anythingElse} to keyboard navigation event"
                                         UpdateDropdownActiveSubtopic (Some st) |> dispatch
                                     // Select subtopic with enter or arrow-right when focused
@@ -228,10 +228,10 @@ module ButtonDropdown =
                         Bulma.dropdownMenu [
                             Bulma.dropdownContent [
                                 /// except other to add divider in between
-                                for topic in topicList |> List.except [IssueCategory.Other] do
+                                for topic in topicList |> List.except [IssueGeneralTopic.Other] do
                                     yield createDropdownItem model dispatch topic
                                 yield Bulma.dropdownDivider []
-                                yield createDropdownItem model dispatch IssueCategory.Other
+                                yield createDropdownItem model dispatch IssueGeneralTopic.Other
                             ]
                         ]
                     ]
@@ -294,7 +294,7 @@ let myCheckradio (model:Model) dispatch (name:string) (issueType:IssueType) =
             color.isBlack
             checkradio.isCircle
             prop.isChecked (model.FormModel.IssueType = issueType)
-            prop.onClick(fun e ->
+            prop.onChange(fun (e:Browser.Types.Event) ->
                 let nextModel = {
                     model.FormModel with
                         IssueType = issueType
@@ -401,7 +401,7 @@ let emailInput (model:Model) dispatch =
                         prop.onChange(fun (e:Browser.Types.Event) ->
                             let nextFormModel = {
                                 model.FormModel with
-                                    Email = e.Value
+                                    UserEmail = e.Value
                             }
                             UpdateFormModel nextFormModel |> dispatch
                         )

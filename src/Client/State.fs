@@ -7,9 +7,10 @@ open Fable.SimpleJson
 
 type Model = {
     DropdownIsActive: bool
-    DropdownActiveTopic: IssueTypes.IssueCategory option
+    LoadingModal: bool
+    DropdownActiveTopic: IssueTypes.IssueGeneralTopic option
     // True when user navigates to nested dropdown
-    DropdownActiveSubtopic: IssueTypes.IssueTopic option
+    DropdownActiveSubtopic: IssueTypes.Topic option
     FormModel: Form.Model
 }
 
@@ -27,8 +28,9 @@ let curry f a b = f(a,b)
 type Msg =
     // UI
     | ToggleIssueCategoryDropdown
-    | UpdateDropdownActiveTopic of IssueTypes.IssueCategory option
-    | UpdateDropdownActiveSubtopic of IssueTypes.IssueTopic option
+    | UpdateDropdownActiveTopic of IssueTypes.IssueGeneralTopic option
+    | UpdateDropdownActiveSubtopic of IssueTypes.Topic option
+    | UpdateLoadingModal of bool
     // Form input
     | UpdateFormModel of Form.Model
     // API

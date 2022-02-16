@@ -4,31 +4,14 @@ open Azure.Identity
 open Microsoft.Graph
 open FSharp.Control.Tasks
 
-
-
 let scopes = [| "https://graph.microsoft.com/.default" |]
 
-let authCodeCredential = 
-    // Values from app registration
-    let tenantId = "" // tenant id (or use "common")
-    let clientId = "" // app id
-    // User info
-    let username = "" 
-    let password = ""   
-
-    UsernamePasswordCredential(username, password,tenantId, clientId)
-
-
 // Initialize the ms-graph api connection
-let initGraphClient scopes (authCodeCredential:Azure.Core.TokenCredential) =
+let private initGraphClient scopes (authCodeCredential:UsernamePasswordCredential) =
     GraphServiceClient(authCodeCredential, scopes)
 
-// Plan ids
-module PlanIds =
-    let helpdesk = ""
-
 // Returns a bucket-name-to-Id mapping
-let getBuckets (planId) (graphClient:GraphServiceClient)  = 
+let private getBuckets (planId) (graphClient:GraphServiceClient)  = 
     task {
         let! buckets = graphClient.Planner.Plans.Item(planId).Buckets.Request().GetAsync()
         let tmp = 
@@ -39,7 +22,7 @@ let getBuckets (planId) (graphClient:GraphServiceClient)  =
     }
 
 // Creates a task with a title in a bucket assosiated to an existing plan
-let createPlanTask planId bucketId title = 
+let private createPlanTask planId bucketId title = 
     let planTask = PlannerTask()
     planTask.PlanId <- planId
     planTask.BucketId <- bucketId
@@ -47,33 +30,84 @@ let createPlanTask planId bucketId title =
     planTask
 
 // Adds notes to a planner task
-let addNotes notes (planTask:PlannerTask) =
+let private addNotes notes (planTask:PlannerTask) =
     let details = PlannerTaskDetails()
     details.Description <- notes
+    details.PreviewType <- PlannerPreviewType.Description
     planTask.Details <- details
-
     planTask
 
+open IssueTypes
+open Microsoft.AspNetCore.Http
+
+type Form.Model with
+    member this.toMsTarget =
+        if this.IssueTopic.IsNone then failwith "Error. Could not find associated topic for issue."
+        match this.IssueTopic.Value with
+        | Tools IssueSubtopics.Tools.Swate          -> Targets.MSTeams.Swate
+        | Tools IssueSubtopics.Tools.Swobup         -> Targets.MSTeams.Swobup
+        | Tools IssueSubtopics.Tools.ARCCommander   -> Targets.MSTeams.ArcCommander
+        | anyTopic                                  -> Targets.MSTeams.Helpdesk
+    member this.toPlannerTask(ctx:HttpContext, (target:Targets.MSTeams.TeamsChannel), graphApi:GraphServiceClient) =
+        if this.IssueTopic.IsNone then failwith "Error. Could not find associated topic for issue."
+        // match for ms teams info
+        let planId = target.GetId ctx
+        task {
+            let! bucketsMap = graphApi |> getBuckets (planId)
+
+            // bucket
+            let bucketName = target.TypeBucketMap.[this.IssueType]
+            let bucketId = bucketsMap.[bucketName]
+            let updatedTitle = $"[{this.IssueType} | {this.IssueTopic.Value.toCategoryString} > {this.IssueTopic.Value.toSubCategoryString}] {this.IssueTitle}"
+            let task =
+                createPlanTask planId bucketId updatedTitle
+            // add labels if existing
+            if target.Labels |> List.isEmpty |> not then
+                let! plannerDetails = graphApi.Planner.Plans.Item(planId).Details.Request().GetAsync()
+                // labels
+                let targetLabels =
+                    let desc = plannerDetails.CategoryDescriptions
+                    [|desc.Category1; desc.Category2; desc.Category3; desc.Category4; desc.Category5; desc.Category6|]
+                    |> Array.indexed
+                    |> Array.filter (fun (ind,label) -> target.Labels |> List.exists (fun x -> x = label))
+                    |> Array.map fst
+                let labels = PlannerAppliedCategories()
+                if targetLabels |> Array.contains 0 then labels.Category1 <- true
+                if targetLabels |> Array.contains 1 then labels.Category2 <- true
+                if targetLabels |> Array.contains 2 then labels.Category3 <- true
+                if targetLabels |> Array.contains 3 then labels.Category4 <- true
+                if targetLabels |> Array.contains 4 then labels.Category5 <- true
+                if targetLabels |> Array.contains 5 then labels.Category6 <- true
+                task.AppliedCategories <- labels
+            let updatedContent =
+                let baseContent = this.IssueContent
+                if this.UserEmail <> "" then
+                    baseContent + "\n\n" + $"The user requested feedback to: {this.UserEmail}"
+                else
+                    baseContent
+            return
+                task |> addNotes updatedContent
+        }
+        
+
 // Adds the task to a plan using ms-graph api
-let sendPlanTask (graphClient:GraphServiceClient) (planTask:PlannerTask) =
+let private sendPlanTask (graphClient:GraphServiceClient) (planTask:PlannerTask) =
     task {
         return graphClient.Planner.Tasks.Request().AddAsync(planTask)
     }
 
-
 // #######
 // Example
-let graphApi = initGraphClient scopes authCodeCredential
     
-let pltsk () =
+let createPlannerTaskInTeams (formModel:Form.Model, ctx:HttpContext) =
+    let authCodeCredential = Targets.MSTeams.getMSModel ctx
+    let graphApi = initGraphClient scopes authCodeCredential
+    let target = formModel.toMsTarget
     task {
-        let! bucketsMap = graphApi |> getBuckets PlanIds.helpdesk
+        let! plannerTask = formModel.toPlannerTask(ctx,target,graphApi)
 
-        return 
-            createPlanTask PlanIds.helpdesk bucketsMap.["Issues"]
-                "Testing Bugs"
-            |> addNotes """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."""
+        return
+            plannerTask
             |> sendPlanTask graphApi
     } 
 
-pltsk().Wait()
