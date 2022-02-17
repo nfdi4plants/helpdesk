@@ -31,7 +31,7 @@ let mainElement (model:Model) dispatch =
             Bulma.field.hasAddons
             prop.children [
                 Bulma.control.div [
-                    Bulma.button.button [
+                    Bulma.button.a [
                         Bulma.button.isSmall
                         prop.classes ["is-nfdidark"]
                         prop.title "Get new Captcha"
@@ -63,7 +63,7 @@ let mainElement (model:Model) dispatch =
                 ]
                 Bulma.control.div [
                     if model.Captcha.IsSome && model.Captcha.Value.AccessToken <> "" then
-                        Bulma.button.button [
+                        Bulma.button.a [
                             Bulma.button.isSmall
                             color.isSuccess
                             prop.title "Captcha correct!"
