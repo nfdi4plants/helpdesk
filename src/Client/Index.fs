@@ -92,8 +92,8 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         nextModel, cmd
     | SubmitIssueResponse ->
         Alerts.submitSuccessfullyAlert()
-        let nextModel = fst <| init(None) 
-        nextModel, Cmd.none
+        let nextModel, cmd = init(None) 
+        nextModel, cmd
     | GetCaptcha ->
         let nextModel = {
             model with
