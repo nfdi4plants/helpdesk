@@ -18,7 +18,35 @@ let topicList = [
     IssueGeneralTopic.Other
 ]
 
+let SwitchDropdownResponsivePX = 600.
+
 module ButtonDropdown =
+
+    let private backResponsiveDropdownItem (model:Model) dispatch =
+        Bulma.dropdownItem.a [
+            prop.onClick(fun e -> e.stopPropagation(); UpdateDropdownActiveTopic None |> dispatch)
+            prop.children [
+                Html.span [
+                    prop.style [
+                        style.display.flex
+                        style.flexGrow 1
+                        style.alignItems.center
+                    ]
+                    prop.children [
+                        Html.i [
+                            prop.style [
+                                style.custom("marginRight","1rem")
+                            ]
+                            prop.className "fa-solid fa-angle-left"
+                        ]
+                        Html.span [
+                            prop.style [style.marginRight(length.rem 1.5)]
+                            prop.text "Back"
+                        ]
+                    ]
+                ]
+            ]
+        ]
 
     let subcategories (model:Model) dispatch (block: IssueTypes.IssueGeneralTopic) =
         let subcategories = block.subcategories
@@ -67,26 +95,31 @@ module ButtonDropdown =
     let createDropdownItem (model:Model) (dispatch:Msg -> unit) (block: IssueTypes.IssueGeneralTopic)  =
         Bulma.dropdownItem.a [
             if model.DropdownActiveTopic = Some block then Bulma.dropdownItem.isActive
-            prop.style [style.paddingRight(length.rem 1)]
-            prop.onMouseOver(fun _ -> Msg.UpdateDropdownActiveTopic (Some block) |> dispatch)
-            prop.onMouseOut(fun _ -> Msg.UpdateDropdownActiveTopic (None) |> dispatch)
+            prop.style [
+                style.paddingRight(length.rem 1);
+            ]
+            prop.onMouseOver(fun e -> if e.view.innerWidth > SwitchDropdownResponsivePX then Msg.UpdateDropdownActiveTopic (Some block) |> dispatch )
+            prop.onMouseOut(fun e -> if e.view.innerWidth > SwitchDropdownResponsivePX then Msg.UpdateDropdownActiveTopic (None) |> dispatch)
             prop.onClick(fun e ->
-                // prevent main element "dropdwon toggle"
+                // prevent main element "dropdown toggle"
                 e.stopPropagation()
-                let subMore =
-                    match block with
-                    | IssueGeneralTopic.RDM                 -> Topic.RDM IssueSubtopics.RDM.More
-                    | IssueGeneralTopic.Infrastructure      -> Topic.Infrastructure IssueSubtopics.Infrastructure.More
-                    | IssueGeneralTopic.Metadata            -> Topic.Metadata IssueSubtopics.Metadata.More
-                    | IssueGeneralTopic.Tools               -> Topic.Tools IssueSubtopics.Tools.More
-                    | IssueGeneralTopic.Workflows           -> Topic.Workflows IssueSubtopics.Workflows.More
-                    | IssueGeneralTopic.Other               -> Topic.Other
-                ToggleIssueCategoryDropdown |> dispatch
-                let nextModel = {
-                    model.FormModel with
-                        IssueTopic = Some subMore
-                }
-                UpdateFormModel nextModel |> dispatch
+                if e.view.innerWidth < SwitchDropdownResponsivePX then
+                     Msg.UpdateDropdownActiveTopic (Some block) |> dispatch
+                else
+                    let subMore =
+                        match block with
+                        | IssueGeneralTopic.RDM                 -> Topic.RDM IssueSubtopics.RDM.More
+                        | IssueGeneralTopic.Infrastructure      -> Topic.Infrastructure IssueSubtopics.Infrastructure.More
+                        | IssueGeneralTopic.Metadata            -> Topic.Metadata IssueSubtopics.Metadata.More
+                        | IssueGeneralTopic.Tools               -> Topic.Tools IssueSubtopics.Tools.More
+                        | IssueGeneralTopic.Workflows           -> Topic.Workflows IssueSubtopics.Workflows.More
+                        | IssueGeneralTopic.Other               -> Topic.Other
+                    ToggleIssueCategoryDropdown |> dispatch
+                    let nextModel = {
+                        model.FormModel with
+                            IssueTopic = Some subMore
+                    }
+                    UpdateFormModel nextModel |> dispatch
             )
             prop.children [
                 Html.span [
@@ -112,6 +145,45 @@ module ButtonDropdown =
                 ]
                 if block <> IssueGeneralTopic.Other then
                     subcategories model dispatch block
+            ]
+        ]
+
+    /// This is only used on screens smaller than 600px
+    let createDropdownItemSubcategory (model:Model) (dispatch:Msg -> unit) (topic: IssueTypes.Topic)  =
+        Bulma.dropdownItem.a [
+            prop.style [
+                if model.DropdownActiveSubtopic = Some topic then
+                    style.backgroundColor NFDIColors.LightBlue.Base
+                    style.color "white"
+            ]
+            prop.onMouseOver(fun e -> if e.view.innerWidth > SwitchDropdownResponsivePX then Msg.UpdateDropdownActiveSubtopic (Some topic) |> dispatch)
+            prop.onMouseOut(fun e -> if e.view.innerWidth > SwitchDropdownResponsivePX then Msg.UpdateDropdownActiveSubtopic (None) |> dispatch)
+            prop.onClick (fun e ->
+                // prevent main element "dropdwon toggle"
+                e.stopPropagation(); e.preventDefault()
+                let nextModel = {
+                    model.FormModel with
+                        IssueTopic = Some topic
+                }
+                /// Update url for easier url generation
+                let pathName = $"/?topic={topic.toUrlString}"
+                Browser.Dom.window.history.replaceState("",url = pathName)
+                UpdateFormModel nextModel |> dispatch
+                ToggleIssueCategoryDropdown |> dispatch
+            )
+            prop.children [
+                let subCText =
+                    match topic with
+                    | Topic.RDM rdm -> rdm.toString
+                    | Topic.Infrastructure i -> i.toString
+                    | Topic.Metadata m -> m.toString
+                    | Topic.Tools t -> t.toString
+                    | Topic.Workflows w -> w.toString
+                    /// This could happen when somehow Topic.Other gets this element created
+                    | other -> failwith $"Could not match {other} with issue subcategories."
+                Html.span [
+                    prop.text subCText
+                ]
             ]
         ]
 
@@ -218,8 +290,6 @@ module ButtonDropdown =
                                             let isMore = model.FormModel.IssueTopic.Value.toSubCategoryString = "More"
                                             if model.FormModel.IssueTopic.IsNone then
                                                 "Please select"
-                                            elif isMore then
-                                                $"{model.FormModel.IssueTopic.Value.toCategoryString} > {model.FormModel.IssueTopic.Value.toSubCategoryString}"
                                             else
                                                 model.FormModel.IssueTopic.Value.toSubCategoryString
                                         )
@@ -229,12 +299,25 @@ module ButtonDropdown =
                             ]
                         ]
                         Bulma.dropdownMenu [
+                            if model.DropdownActiveTopic.IsSome then
+                                let subcategories = model.DropdownActiveTopic.Value.subcategories
+                                Bulma.dropdownContent [
+                                    prop.classes ["responsive-dropdown-subcontent"]
+                                    prop.children [
+                                        yield backResponsiveDropdownItem model dispatch
+                                        yield Bulma.dropdownDivider []
+                                        for topic in subcategories do
+                                            yield createDropdownItemSubcategory model dispatch topic
+                                    ]
+                                ]
                             Bulma.dropdownContent [
-                                /// except other to add divider in between
-                                for topic in topicList |> List.except [IssueGeneralTopic.Other] do
-                                    yield createDropdownItem model dispatch topic
-                                yield Bulma.dropdownDivider []
-                                yield createDropdownItem model dispatch IssueGeneralTopic.Other
+                                if model.DropdownActiveTopic.IsSome then prop.classes ["responsive-dropdown-content"]
+                                prop.children [
+                                    for topic in topicList |> List.except [IssueGeneralTopic.Other] do
+                                        yield createDropdownItem model dispatch topic
+                                    yield Bulma.dropdownDivider []
+                                    yield createDropdownItem model dispatch IssueGeneralTopic.Other
+                                ]
                             ]
                         ]
                     ]

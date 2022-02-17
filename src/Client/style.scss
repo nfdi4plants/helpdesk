@@ -704,6 +704,24 @@ body {
     color: black
 }
 
+.responsive-dropdown-subcontent {
+    display: none !important
+}
+
+@media only screen and (max-width: 600px) {
+    .dropdown-item .nested-dropdown {
+        display: none !important;
+    }
+
+    .responsive-dropdown-subcontent {
+        display: inherit !important
+    }
+
+    .responsive-dropdown-content {
+        display: none !important
+    }
+}
+
 .dropdown-content .dropdown-item:nth-child(n+4) .nested-dropdown {
     bottom: 0;
 }
