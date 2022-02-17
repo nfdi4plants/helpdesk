@@ -8,15 +8,24 @@ open SixLabors
 open SixLabors.Fonts
 open System
 open System.IO
+open System.Security.Cryptography
 
 let private fontArr = [|"Arial"; "Verdana"; "Times New Roman"|]
 let private colorArr = Color.WebSafePalette.ToArray()
 let private charArr = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890"
 let private rand = System.Random()
 let private backcolor = Color.AliceBlue
-let private textColor = Color.Black
+let private textColor = Color.FromRgb(byte 45, byte 62, byte 80)
 let private fontsize = float32 40
 let private rotationDegree = 30
+
+let createToken(size) =
+    let mutable byteArr  = 
+        let b = Array.init size (fun _ -> byte 0)
+        System.Span<Byte>(b)
+    RandomNumberGenerator.Fill(byteArr)
+    byteArr.ToArray()
+    |> System.Convert.ToBase64String
 
 let createCaptchaString(length:int) =
     String.init length (fun i -> string charArr.[rand.Next(0,charArr.Length-1)])
@@ -70,6 +79,18 @@ let createCaptchaImgBase64(captchaClear:string) =
 
         img.Mutate(fun x -> x.DrawImage(imgCharacter, float32 1) |> ignore ) 
         imgCharacter.Dispose()
+
+    let randomY() = rand.Next(0, int imgHeight) |> float32
+    let randomLine() =
+        let n = rand.Next(2,6)
+        let slize = imgWidth / float32 n
+        printfn "width: %A" imgWidth
+        printfn "n: %i; slize: %A" n slize
+        Array.init (n+1) (fun i -> PointF(float32 i * slize, randomY()) )
+
+    img.Mutate(fun x ->
+        x.DrawLines(textColor, float32 2., randomLine()).DrawLines(textColor, float32 2., randomLine()).DrawLines(textColor, float32 2., randomLine()) |> ignore
+    )
 
     let stream = new MemoryStream();
     img.Save(stream,Formats.Png.PngEncoder());

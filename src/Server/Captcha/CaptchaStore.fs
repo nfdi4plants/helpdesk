@@ -1,7 +1,7 @@
 module CaptchaStore
 
 open System
-open System.Security.Cryptography
+
 
 open Captcha
 
@@ -12,14 +12,6 @@ type Captcha = {
     Accesstoken : string
     CreatedAt   : DateTime
 } with
-    static member createToken(size) =
-        let mutable byteArr  = 
-            let b = Array.init size (fun _ -> byte 0)
-            System.Span<Byte>(b)
-        RandomNumberGenerator.Fill(byteArr)
-        byteArr.ToArray()
-        |> System.Convert.ToBase64String
-
     member this.toClientType :CaptchaTypes.ClientCaptcha = {
         Id          = this.Id
         ImageBase64 = this.ImageBase64
