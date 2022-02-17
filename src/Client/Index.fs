@@ -3,7 +3,7 @@ module Index
 open Elmish
 open Fable.Remoting.Client
 open Shared
-
+open Fable.Core.JsInterop
 open Routing
 open State
 
@@ -20,7 +20,18 @@ let urlUpdate (route: Route option) (model:Model) =
                 { model with FormModel = nextFormModel }
         nextModel, Cmd.none
     | None -> model, Cmd.none
-        
+
+let clearInputs() =
+    let inptuById(id) = Browser.Dom.document.getElementById(id)
+    let title = inptuById(InputIds.TitleInput)
+    title?value <- ""
+    let description = inptuById(InputIds.DescriptionInput)
+    description?value <- ""
+    let email = inptuById(InputIds.EmailInput)
+    email?value <- ""
+    let captcha = inptuById(InputIds.CaptchaInput)
+    captcha?value <- ""
+    
 
 let init(url: Routing.Route option) : Model * Cmd<Msg> =
     let model = {
@@ -91,8 +102,11 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
                     (curry GenericError <| Cmd.ofMsg (UpdateLoadingModal false))
         nextModel, cmd
     | SubmitIssueResponse ->
+        clearInputs()
+        Browser.Dom.window.scroll(0.,0.,Browser.Types.ScrollBehavior.Smooth)
+        Browser.Dom.document.getElementById(InputIds.RadioQuestion).focus()
+        let nextModel, cmd = init(None)
         Alerts.submitSuccessfullyAlert()
-        let nextModel, cmd = init(None) 
         nextModel, cmd
     | GetCaptcha ->
         let nextModel = {
@@ -115,6 +129,7 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         let nextModel = {
             model with
                 LoadingModal = true
+                CaptchaDoneWrong = false
         }
         let cmd =
             Cmd.OfAsync.either

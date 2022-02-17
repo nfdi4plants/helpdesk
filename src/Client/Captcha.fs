@@ -49,6 +49,7 @@ let mainElement (model:Model) dispatch =
                     prop.style [style.width (length.percent 100)]
                     prop.children [
                         Bulma.input.text [
+                            prop.id InputIds.CaptchaInput
                             Bulma.input.isSmall
                             prop.placeholder "Captcha"
                             prop.onChange (fun (e:Browser.Types.Event) ->

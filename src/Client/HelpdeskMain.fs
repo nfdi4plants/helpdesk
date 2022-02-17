@@ -100,24 +100,29 @@ module ButtonDropdown =
             ]
             prop.onMouseOver(fun e -> if e.view.innerWidth > SwitchDropdownResponsivePX then Msg.UpdateDropdownActiveTopic (Some block) |> dispatch )
             prop.onMouseOut(fun e -> if e.view.innerWidth > SwitchDropdownResponsivePX then Msg.UpdateDropdownActiveTopic (None) |> dispatch)
+            // Only choose "More" when user actively clicks on 
             prop.onClick(fun e ->
                 // prevent main element "dropdown toggle"
-                e.stopPropagation()
-                if e.view.innerWidth < SwitchDropdownResponsivePX then
-                     Msg.UpdateDropdownActiveTopic (Some block) |> dispatch
-                else
-                    let subMore =
-                        match block with
-                        | IssueGeneralTopic.RDM                 -> Topic.RDM IssueSubtopics.RDM.More
-                        | IssueGeneralTopic.Infrastructure      -> Topic.Infrastructure IssueSubtopics.Infrastructure.More
-                        | IssueGeneralTopic.Metadata            -> Topic.Metadata IssueSubtopics.Metadata.More
-                        | IssueGeneralTopic.Tools               -> Topic.Tools IssueSubtopics.Tools.More
-                        | IssueGeneralTopic.Workflows           -> Topic.Workflows IssueSubtopics.Workflows.More
-                        | IssueGeneralTopic.Other               -> Topic.Other
+                e.stopPropagation(); e.preventDefault()
+                //if e.view.innerWidth < SwitchDropdownResponsivePX then
+                //     Msg.UpdateDropdownActiveTopic (Some block) |> dispatch
+                //else
+                //    let topic =
+                //        match block with
+                //        | IssueGeneralTopic.RDM                 -> Topic.RDM IssueSubtopics.RDM.More
+                //        | IssueGeneralTopic.Infrastructure      -> Topic.Infrastructure IssueSubtopics.Infrastructure.More
+                //        | IssueGeneralTopic.Metadata            -> Topic.Metadata IssueSubtopics.Metadata.More
+                //        | IssueGeneralTopic.Tools               -> Topic.Tools IssueSubtopics.Tools.More
+                //        | IssueGeneralTopic.Workflows           -> Topic.Workflows IssueSubtopics.Workflows.More
+                //        | IssueGeneralTopic.Other               -> Topic.Other
+                if block = IssueGeneralTopic.Other then
                     ToggleIssueCategoryDropdown |> dispatch
+                    /// Update url for easier url generation
+                    let pathName = $"/?topic={Topic.Other.toUrlString}"
+                    Browser.Dom.window.history.replaceState("",url = pathName)
                     let nextModel = {
                         model.FormModel with
-                            IssueTopic = Some subMore
+                            IssueTopic = Some Topic.Other
                     }
                     UpdateFormModel nextModel |> dispatch
             )
@@ -245,6 +250,8 @@ module ButtonDropdown =
                                     // select other with enter or arrow-right when focused
                                     | 39. | 13. when model.DropdownActiveTopic = Some IssueGeneralTopic.Other ->
                                         e.preventDefault()
+                                        let pathName = $"/?topic={Topic.Other.toUrlString}"
+                                        Browser.Dom.window.history.replaceState("",url = pathName)
                                         ToggleIssueCategoryDropdown |> dispatch
                                         let nextModel = {
                                             model.FormModel with
@@ -263,6 +270,8 @@ module ButtonDropdown =
                                     // Select subtopic with enter or arrow-right when focused
                                     | 39. | 13. when model.DropdownActiveSubtopic.IsSome ->
                                         e.preventDefault()
+                                        let pathName = $"/?topic={model.DropdownActiveSubtopic.Value.toUrlString}"
+                                        Browser.Dom.window.history.replaceState("",url = pathName)
                                         ToggleIssueCategoryDropdown |> dispatch
                                         let nextModel = {
                                             model.FormModel with
@@ -431,6 +440,7 @@ let issuetitleInputElement model dispatch =
                         control.isExpanded
                         prop.children [
                             Bulma.input.text [
+                                prop.id InputIds.TitleInput
                                 prop.placeholder "please give your issue a title .."
                                 prop.onChange(fun (e:Browser.Types.Event) ->
                                     let nextFormModel = {
@@ -458,6 +468,7 @@ let issueContentElement (model:Model) dispatch =
                 ]
             ]
             Bulma.textarea [
+                prop.id InputIds.DescriptionInput
                 prop.placeholder "please describe your issue .."
                 prop.onChange(fun (e:Browser.Types.Event) ->
                     let nextFormModel = {
@@ -483,6 +494,7 @@ let emailInput (model:Model) dispatch =
                 Bulma.control.hasIconsLeft
                 prop.children [
                     Bulma.input.email [
+                        prop.id InputIds.EmailInput
                         prop.placeholder "Email"
                         prop.onChange(fun (e:Browser.Types.Event) ->
                             let nextFormModel = {

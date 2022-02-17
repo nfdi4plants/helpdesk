@@ -6,6 +6,29 @@ open Shared
 open Fable.SimpleJson
 open System
 
+module InputIds =
+    [<Literal>]
+    let CaptchaInput = "CaptchaInput"
+
+    [<Literal>]
+    let TitleInput = "TitleInput"
+
+    [<Literal>]
+    let DescriptionInput = "DescriptionInput"
+
+    [<Literal>]
+    let EmailInput = "EmailInput"
+
+    [<Literal>]
+    let RadioQuestion = "radio1Question"
+
+    let inputIdList = [
+        CaptchaInput
+        TitleInput
+        DescriptionInput
+        EmailInput
+    ]
+
 type Model = {
     DropdownIsActive: bool
     LoadingModal: bool
