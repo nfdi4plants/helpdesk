@@ -14,10 +14,8 @@ let CaptchaStore = CaptchaStore.Storage()
 
 let api ctx = {
     submitIssue = fun (formModel,captcha) -> async {
-        printfn "reached server side"
         let storedCaptcha = CaptchaStore.GetCaptcha(captcha.Id)
         let hasValidToken = captcha.AccessToken = storedCaptcha.Accesstoken
-        printfn "hasValidToken: %A" hasValidToken
         if not hasValidToken then
             failwith "Error. Captcha access token is no longer valid. Please redo the captcha and try again."
         if formModel.IssueTopic.IsNone then failwith "Error. Could not find associated topic for issue."

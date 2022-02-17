@@ -10,7 +10,7 @@ type Captcha = {
     Cleartext   : string
     ImageBase64 : string
     Accesstoken : string
-    ServerTime  : DateTime
+    CreatedAt   : DateTime
 } with
     static member createToken(size) =
         let mutable byteArr  = 
@@ -30,21 +30,25 @@ type Captcha = {
 type Storage() =
     let captchas = ResizeArray<Captcha>()
 
-    member __.GetCaptchas() = List.ofSeq captchas
+    member this.GetCaptchas() =
+        this.removeOldCaptchas()
+        List.ofSeq captchas
 
-    member __.GenerateCaptcha() =
+    member this.GenerateCaptcha() =
+        this.removeOldCaptchas()
         let clearText = Captcha.createCaptchaString 7
         let captcha = {
             Id          = Guid.NewGuid()
             Cleartext   = clearText
             ImageBase64 = Captcha.createCaptchaImgBase64(clearText)
             Accesstoken = Captcha.createToken(32)
-            ServerTime  = DateTime.Now.ToUniversalTime()
+            CreatedAt   = DateTime.Now.ToUniversalTime()
         }
         captchas.Add captcha
         captcha.toClientType
 
-    member __.GetCaptcha(id:Guid) =
+    member this.GetCaptcha(id:Guid) =
+        this.removeOldCaptchas()
         let m =
             List.ofSeq captchas
             |> List.map (fun x -> x.Id, x)
@@ -53,4 +57,17 @@ type Storage() =
 
     member __.RemoveCaptcha(item:Captcha) =
         captchas.Remove(item)
+
+    member __.removeOldCaptchas() =
+        let now = DateTime.Now.ToUniversalTime()
+        let clearedList =
+            List.ofSeq captchas
+            /// remove captchas older than 24h
+            |> List.choose (fun storedCaptcha ->
+                let timeSinceCreated = now.Subtract(storedCaptcha.CreatedAt)
+                if timeSinceCreated.Hours >= 24 then None else Some storedCaptcha
+            )
+        captchas.Clear()
+        captchas.AddRange clearedList
+
         
