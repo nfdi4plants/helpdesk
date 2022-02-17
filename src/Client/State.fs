@@ -4,6 +4,7 @@ open Elmish
 open Fable.Remoting.Client
 open Shared
 open Fable.SimpleJson
+open System
 
 type Model = {
     DropdownIsActive: bool
@@ -12,6 +13,9 @@ type Model = {
     // True when user navigates to nested dropdown
     DropdownActiveSubtopic: IssueTypes.Topic option
     FormModel: Form.Model
+    Captcha: CaptchaTypes.ClientCaptcha option
+    CaptchaLoading: bool
+    CaptchaDoneWrong: bool
 }
 
 type System.Exception with
@@ -31,12 +35,20 @@ type Msg =
     | UpdateDropdownActiveTopic of IssueTypes.IssueGeneralTopic option
     | UpdateDropdownActiveSubtopic of IssueTypes.Topic option
     | UpdateLoadingModal of bool
+    | UpdateCaptchaLoading of bool
+    | UpdateCaptchaDoneWrong of bool
+    // Captcha input
+    | UpdateCaptchaClient of CaptchaTypes.ClientCaptcha option
     // Form input
     | UpdateFormModel of Form.Model
     // API
     | SubmitIssueRequest
     | SubmitIssueResponse
     | GenericError of Cmd<Msg> * exn
+    | GetCaptcha
+    | GetCaptchaResponse of CaptchaTypes.ClientCaptcha option
+    | CheckCaptcha
+    | CheckCaptchaResponse of Result<CaptchaTypes.ClientCaptcha, CaptchaTypes.ClientCaptcha>
 
 let api =
     Remoting.createApi ()

@@ -2,3 +2,4 @@ Saturn
 Fable.Remoting.Giraffe
 Microsoft.AspNetCore.Authentication.JwtBearer
 Microsoft.Graph
+SixLabors.ImageSharp.Drawing

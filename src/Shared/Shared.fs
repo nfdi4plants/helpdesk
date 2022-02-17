@@ -8,5 +8,8 @@ module Route =
 
 
 type IHelpdeskAPI = {
-    submitIssue: Form.Model -> Async<unit>
+    submitIssue: Form.Model * CaptchaTypes.ClientCaptcha -> Async<unit>
+    getCaptcha: unit -> Async<CaptchaTypes.ClientCaptcha>
+    checkCaptcha: CaptchaTypes.ClientCaptcha ->Async<Result<CaptchaTypes.ClientCaptcha,CaptchaTypes.ClientCaptcha>>
 }
+

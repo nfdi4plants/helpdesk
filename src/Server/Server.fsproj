@@ -7,6 +7,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Version.fs" />
+    <Compile Include="Captcha\CaptchaCreate.fs" />
+    <Compile Include="Captcha\CaptchaStore.fs" />
     <Compile Include="Targets.fs" />
     <Compile Include="MSInterop.fs" />
     <None Include="paket.references" />

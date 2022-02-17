@@ -29,10 +29,14 @@ let init(url: Routing.Route option) : Model * Cmd<Msg> =
         FormModel = Form.Model.init();
         DropdownActiveTopic = None
         DropdownActiveSubtopic = None
+        Captcha = None
+        CaptchaLoading = false
+        CaptchaDoneWrong = false
     }
+    let initCaptcha = Cmd.ofMsg GetCaptcha
     let route = Routing.parsePath Browser.Dom.document.location
     let model, cmd = urlUpdate route model
-    model, cmd
+    model, Cmd.batch [initCaptcha; cmd]
 
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg with
@@ -55,6 +59,19 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         { model with
             LoadingModal = isActive },
         Cmd.none
+    | UpdateCaptchaLoading isLoading ->
+        { model with
+            CaptchaLoading = isLoading },
+        Cmd.none
+    | UpdateCaptchaDoneWrong isWrong ->
+        { model with
+            CaptchaDoneWrong = isWrong },
+        Cmd.none
+    // Captcha input
+    | UpdateCaptchaClient nextCaptcha ->
+        { model with
+            Captcha = nextCaptcha },
+        Cmd.none
     // Form input
     | UpdateFormModel nextFormModel ->
         { model with
@@ -69,14 +86,54 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         let cmd =
             Cmd.OfAsync.either
                 api.submitIssue
-                    model.FormModel
+                    (model.FormModel, model.Captcha.Value)
                     (fun () -> SubmitIssueResponse)
                     (curry GenericError <| Cmd.ofMsg (UpdateLoadingModal false))
         nextModel, cmd
     | SubmitIssueResponse ->
         Alerts.submitSuccessfullyAlert()
         let nextModel = fst <| init(None) 
-        {model with LoadingModal = false}, Cmd.none
+        nextModel, Cmd.none
+    | GetCaptcha ->
+        let nextModel = {
+            model with
+                CaptchaLoading = true
+        }
+        let cmd =
+            Cmd.OfAsync.either
+                api.getCaptcha
+                ()
+                (Some >> GetCaptchaResponse)
+                (curry GenericError (Cmd.ofMsg <| UpdateCaptchaLoading false))
+        nextModel, cmd
+    | GetCaptchaResponse captcha ->
+        { model with
+            Captcha = captcha
+            CaptchaLoading = false
+        }, Cmd.none
+    | CheckCaptcha ->
+        let nextModel = {
+            model with
+                LoadingModal = true
+        }
+        let cmd =
+            Cmd.OfAsync.either
+                api.checkCaptcha
+                (model.Captcha.Value)
+                (CheckCaptchaResponse)
+                (curry GenericError (Cmd.ofMsg <| UpdateLoadingModal false))
+        nextModel, cmd
+    | CheckCaptchaResponse (Ok captcha) ->
+        { model with
+            Captcha = Some captcha
+            LoadingModal = false
+        }, Cmd.none
+    | CheckCaptchaResponse (Error captcha) ->
+        { model with
+            Captcha = Some captcha
+            LoadingModal = false
+            CaptchaDoneWrong = true
+        }, Cmd.none
     | GenericError (nextCmd,exn) ->
         Alerts.genericErrorAlert(exn)
         model, nextCmd

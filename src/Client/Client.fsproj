@@ -14,6 +14,7 @@
         <Compile Include="Modal.fs" />
         <Compile Include="alerts.fs" />
         <Compile Include="nfdi-webcomponents.fs" />
+        <Compile Include="Captcha.fs" />
         <Compile Include="HelpdeskMain.fs" />
         <Compile Include="Index.fs" />
         <Compile Include="App.fs" />

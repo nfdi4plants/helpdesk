@@ -104,7 +104,7 @@ module ButtonDropdown =
                         if block <> IssueGeneralTopic.Other then
                             Html.i [
                                 prop.style [
-                                    style.custom("margin-left","auto")
+                                    style.custom("marginLeft","auto")
                                 ]
                                 prop.className "fa-solid fa-angle-right"
                             ]
@@ -425,24 +425,26 @@ let emailInput (model:Model) dispatch =
 let captchaANDsubmit (model:Model) dispatch =
     Bulma.content [
         Bulma.box [
-            Bulma.columns [
-                // Captcha
-                Bulma.column [prop.text "captcha"]
+            Bulma.field.div [
+                CaptchaClient.mainElement model dispatch
+            ]
+            Bulma.field.div [
                 // Submits
-                Bulma.column [
-                    Bulma.button.button [
-                        prop.onClick (fun _ -> dispatch SubmitIssueRequest)
-                        prop.classes ["is-nfdidark"]
-                        //color.isInfo
-                        Bulma.button.isFullWidth
-                        prop.children [
-                            Html.span "Submit"
-                            Html.span [
-                                prop.classes ["icon is-small"]
-                                prop.children [
-                                    Html.i [
-                                        prop.className "fa-solid fa-share"
-                                    ]
+                Bulma.button.button [
+                    let isActive = model.Captcha.IsSome && model.Captcha.Value.AccessToken <> ""
+                    prop.onClick (fun _ ->
+                        if isActive then dispatch SubmitIssueRequest else ()
+                    )
+                    prop.classes ["is-nfdidark"]
+                    if not isActive then Bulma.button.isStatic
+                    Bulma.button.isFullWidth
+                    prop.children [
+                        Html.span "Submit"
+                        Html.span [
+                            prop.classes ["icon is-small"]
+                            prop.children [
+                                Html.i [
+                                    prop.className "fa-solid fa-share"
                                 ]
                             ]
                         ]

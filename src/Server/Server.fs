@@ -10,16 +10,43 @@ open Shared
 
 open Targets
 
+let CaptchaStore = CaptchaStore.Storage()
+
 let api ctx = {
-    submitIssue = fun (formModel) -> async {
+    submitIssue = fun (formModel,captcha) -> async {
+        printfn "reached server side"
+        let storedCaptcha = CaptchaStore.GetCaptcha(captcha.Id)
+        let hasValidToken = captcha.AccessToken = storedCaptcha.Accesstoken
+        printfn "hasValidToken: %A" hasValidToken
+        if not hasValidToken then
+            failwith "Error. Captcha access token is no longer valid. Please redo the captcha and try again."
         if formModel.IssueTopic.IsNone then failwith "Error. Could not find associated topic for issue."
         if formModel.IssueTitle = "" then failwith "Error. Cannot submit issue with empty title"
-        printfn "%A" formModel
         try
             MSInterop.createPlannerTaskInTeams(formModel,ctx).Wait()
+            CaptchaStore.RemoveCaptcha(storedCaptcha) |> ignore
         with
             | exn -> failwith $"Hit exception: {exn}"
         return ()
+    }
+    getCaptcha = fun () -> async {
+        let newCaptcha = CaptchaStore.GenerateCaptcha()
+        return newCaptcha
+    }
+    checkCaptcha = fun clientCaptcha -> async {
+        let storedCaptcha = CaptchaStore.GetCaptcha(clientCaptcha.Id)
+        let isCorrect = storedCaptcha.Cleartext = clientCaptcha.UserInput.Trim()
+        let result =
+            if isCorrect then 
+                Ok {clientCaptcha with AccessToken = storedCaptcha.Accesstoken}
+            else
+                let wasRemoved = CaptchaStore.RemoveCaptcha(storedCaptcha)
+                printfn "user input: %A" (clientCaptcha.UserInput.Trim())
+                printfn "stored pw: %A" storedCaptcha.Cleartext
+                printfn "Captcha failed. Was deleted: %A." wasRemoved
+                let newCaptcha = CaptchaStore.GenerateCaptcha()
+                Error newCaptcha
+        return result
     }
 }
 
