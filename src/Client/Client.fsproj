@@ -9,6 +9,7 @@
         <None Include="style.scss" />
         <None Include="paket.references" />
         <None Include="index.html" />
+        <Compile Include="Routing.fs" />
         <Compile Include="State.fs" />
         <Compile Include="Modal.fs" />
         <Compile Include="alerts.fs" />

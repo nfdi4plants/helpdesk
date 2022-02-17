@@ -1,5 +1,7 @@
 module rec IssueTypes
 
+open System
+
 type IssueType =
 | Question
 | Bug
@@ -31,6 +33,16 @@ module IssueSubtopics =
             | AnnotationPrinciples  -> "Annotation Principles"
             | More                  -> "More"
 
+        static member ofString(str) =
+            match str with
+            | "Data Security" | "DataSecurity"                  -> DataSecurity        
+            | "Data Literacy" | "DataLiteracy"                  -> DataLiteracy        
+            | "Teaching"                                        -> Teaching            
+            | "ARC Structure" | "ARCStructure"                  -> ARCStructure        
+            | "Annotation Principles"| "AnnotationPrinciples"   -> AnnotationPrinciples
+            | "More" | "More"                                   -> More
+            | anythingElse -> failwith $"Could not parse {anythingElse} to RDM subtopic"
+
     type Infrastructure =
     | RegistrationLogin
     | GitLab
@@ -48,6 +60,16 @@ module IssueSubtopics =
             | Invenio              -> "Invenio"
             | InfrastructureCode   -> "Infrastructure Code"
             | More                 -> "More"
+
+        static member ofString(str) =
+            match str with
+            | "Registration Login"  | "RegistrationLogin"    -> RegistrationLogin 
+            | "GitLab" -> GitLab            
+            | "Metadata Registry"   | "MetadataRegistry"     -> MetadataRegistry  
+            | "Invenio" -> Invenio           
+            | "Infrastructure Code" | "InfrastructureCode"   -> InfrastructureCode
+            | "More" -> More
+            | anythingElse -> failwith $"Could not parse {anythingElse} to Infrastructure subtopic"
 
     type Tools =
     | ARCCommander
@@ -67,6 +89,16 @@ module IssueSubtopics =
             | Converters    -> "Converters"
             | More          -> "More"
 
+        static member ofString(str) =
+            match str with
+            | "ARC Commander" -> ARCCommander 
+            | "Swate"         -> Swate        
+            | "DMP Generator" -> DMPGenerator 
+            | "Swobup"        -> Swobup       
+            | "Converters"    -> Converters   
+            | "More"          -> More
+            | anythingElse -> failwith $"Could not parse {anythingElse} to Tools subtopic"
+
     type Workflows =
     | CWL
     | Galaxy
@@ -79,6 +111,13 @@ module IssueSubtopics =
             | Galaxy    -> "Galaxy"
             | More      -> "More"
 
+        static member ofString(str) =
+            match str with
+            | "CWL"    -> CWL   
+            | "Galaxy" -> Galaxy
+            | "More"   -> More
+            | anythingElse -> failwith $"Could not parse {anythingElse} to Workflows subtopic"
+
     type Metadata =
     | OntologyUpdate
     | SwateTemplate
@@ -90,6 +129,13 @@ module IssueSubtopics =
             | OntologyUpdate    -> "Ontology Update"
             | SwateTemplate     -> "Swate Template"
             | More              -> "More"
+
+        static member ofString(str) =
+            match str with
+            | "Ontology Update" | "OntologyUpdate" ->  OntologyUpdate 
+            | "Swate Template" | "SwateTemplate" ->  SwateTemplate  
+            | "More" -> More
+            | anythingElse -> failwith $"Could not parse {anythingElse} to Metadata subtopic"
 
 /// This should be the main type for working with issue categories
 type Topic =
@@ -119,6 +165,39 @@ type Topic =
         | Metadata _        -> IssueGeneralTopic.Metadata.toString
         | Other             -> IssueGeneralTopic.Other.toString
 
+    member this.toUrlString =
+        let rmWhitespace(str:string) = str.Replace(" ","")
+        match this with
+        | RDM rdm           -> $"{rmWhitespace IssueGeneralTopic.RDM.toString}_{rmWhitespace rdm.toString}" 
+        | Infrastructure i  -> $"{rmWhitespace IssueGeneralTopic.Infrastructure.toString}_{rmWhitespace i.toString}" 
+        | Tools t           -> $"{rmWhitespace IssueGeneralTopic.Tools.toString}_{rmWhitespace t.toString}" 
+        | Workflows w       -> $"{rmWhitespace IssueGeneralTopic.Workflows.toString}_{rmWhitespace w.toString}" 
+        | Metadata m        -> $"{rmWhitespace IssueGeneralTopic.Metadata.toString}_{rmWhitespace m.toString}" 
+        | Other             -> rmWhitespace IssueGeneralTopic.Other.toString
+
+    static member ofUrlString(str:string) =
+        let majorTopic, subtopic =
+            let ind = str.IndexOf("_")
+            str.[..ind-1],str.[ind+1..]
+        match IssueGeneralTopic.ofString majorTopic with
+        | IssueGeneralTopic.RDM            ->
+            let subtopic = IssueSubtopics.RDM.ofString subtopic
+            Topic.RDM subtopic
+        | IssueGeneralTopic.Infrastructure ->
+            let subtopic = IssueSubtopics.Infrastructure.ofString subtopic
+            Topic.Infrastructure subtopic
+        | IssueGeneralTopic.Tools          ->
+            let subtopic = IssueSubtopics.Tools.ofString subtopic
+            Topic.Tools subtopic
+        | IssueGeneralTopic.Workflows      ->
+            let subtopic = IssueSubtopics.Workflows.ofString subtopic
+            Topic.Workflows subtopic
+        | IssueGeneralTopic.Metadata       ->
+            let subtopic = IssueSubtopics.Metadata.ofString subtopic
+            Topic.Metadata subtopic
+        | IssueGeneralTopic.Other          ->
+            Topic.Other
+
 /// Use this type only to create elements
 [<RequireQualifiedAccess>]
 type IssueGeneralTopic =
@@ -133,7 +212,7 @@ type IssueGeneralTopic =
 with
     static member ofString (str:string) =
         match str with
-        | "RDM" | "Research Data Management"    -> RDM
+        | "RDM" | "Research Data Management" | "ResearchDataManagement" -> RDM
         | "Infrastructure"                      -> Infrastructure
         | "Tools"                               -> Tools
         | "Workflows"                           -> Workflows

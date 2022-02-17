@@ -54,6 +54,9 @@ module ButtonDropdown =
                                     model.FormModel with
                                         IssueTopic = Some topic
                                 }
+                                /// Update url for easier url generation
+                                let pathName = $"/?topic={topic.toUrlString}"
+                                Browser.Dom.window.history.replaceState("",url = pathName)
                                 UpdateFormModel nextModel |> dispatch
                             )
                             prop.text subCText

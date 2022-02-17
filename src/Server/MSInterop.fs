@@ -44,9 +44,9 @@ type Form.Model with
     member this.toMsTarget =
         if this.IssueTopic.IsNone then failwith "Error. Could not find associated topic for issue."
         match this.IssueTopic.Value with
-        | Tools IssueSubtopics.Tools.Swate          -> Targets.MSTeams.Swate
-        | Tools IssueSubtopics.Tools.Swobup         -> Targets.MSTeams.Swobup
-        | Tools IssueSubtopics.Tools.ARCCommander   -> Targets.MSTeams.ArcCommander
+        //| Tools IssueSubtopics.Tools.Swate          -> Targets.MSTeams.Swate
+        //| Tools IssueSubtopics.Tools.Swobup         -> Targets.MSTeams.Swobup
+        //| Tools IssueSubtopics.Tools.ARCCommander   -> Targets.MSTeams.ArcCommander
         | anyTopic                                  -> Targets.MSTeams.Helpdesk
     member this.toPlannerTask(ctx:HttpContext, (target:Targets.MSTeams.TeamsChannel), graphApi:GraphServiceClient) =
         if this.IssueTopic.IsNone then failwith "Error. Could not find associated topic for issue."
@@ -58,8 +58,8 @@ type Form.Model with
             // bucket
             let bucketName = target.TypeBucketMap.[this.IssueType]
             let bucketId = bucketsMap.[bucketName]
-            let updatedTitle = $"[{this.IssueType} | {this.IssueTopic.Value.toCategoryString} > {this.IssueTopic.Value.toSubCategoryString}] {this.IssueTitle}"
-            let task =
+            let updatedTitle = $"{this.IssueTopic.Value.toSubCategoryString} | {this.IssueType} | {this.IssueTitle}"
+            let task = 
                 createPlanTask planId bucketId updatedTitle
             // add labels if existing
             if target.Labels |> List.isEmpty |> not then

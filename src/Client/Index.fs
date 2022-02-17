@@ -4,10 +4,25 @@ open Elmish
 open Fable.Remoting.Client
 open Shared
 
+open Routing
 open State
 
+/// update on top of Model.init() according to entry url
+let urlUpdate (route: Route option) (model:Model) =
+    match route with
+    | Some (Route.Home topicStr) ->
+        let nextModel =
+            if topicStr.IsNone then
+                model
+            else
+                let parsedTopic = IssueTypes.Topic.ofUrlString topicStr.Value
+                let nextFormModel = { model.FormModel with IssueTopic = Some parsedTopic }
+                { model with FormModel = nextFormModel }
+        nextModel, Cmd.none
+    | None -> model, Cmd.none
+        
 
-let init () : Model * Cmd<Msg> =
+let init(url: Routing.Route option) : Model * Cmd<Msg> =
     let model = {
         DropdownIsActive = false
         LoadingModal = false
@@ -15,7 +30,9 @@ let init () : Model * Cmd<Msg> =
         DropdownActiveTopic = None
         DropdownActiveSubtopic = None
     }
-    model, Cmd.none
+    let route = Routing.parsePath Browser.Dom.document.location
+    let model, cmd = urlUpdate route model
+    model, cmd
 
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg with
@@ -58,14 +75,11 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         nextModel, cmd
     | SubmitIssueResponse ->
         Alerts.submitSuccessfullyAlert()
-        let nextModel = fst <| init() 
+        let nextModel = fst <| init(None) 
         {model with LoadingModal = false}, Cmd.none
     | GenericError (nextCmd,exn) ->
         Alerts.genericErrorAlert(exn)
         model, nextCmd
-        
-
-        
         
 
 open Feliz
