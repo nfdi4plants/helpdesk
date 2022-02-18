@@ -39,6 +39,14 @@ type Storage() =
         captchas.Add captcha
         captcha.toClientType
 
+    member this.TryGetCaptcha(id:Guid) =
+        this.removeOldCaptchas()
+        let m =
+            List.ofSeq captchas
+            |> List.map (fun x -> x.Id, x)
+            |> Map.ofList
+        m.TryFind id
+
     member this.GetCaptcha(id:Guid) =
         this.removeOldCaptchas()
         let m =

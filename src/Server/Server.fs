@@ -39,9 +39,6 @@ let api ctx = {
                 Ok {clientCaptcha with AccessToken = storedCaptcha.Accesstoken}
             else
                 let wasRemoved = CaptchaStore.RemoveCaptcha(storedCaptcha)
-                printfn "user input: %A" (clientCaptcha.UserInput.Trim())
-                printfn "stored pw: %A" storedCaptcha.Cleartext
-                printfn "Captcha failed. Was deleted: %A." wasRemoved
                 let newCaptcha = CaptchaStore.GenerateCaptcha()
                 Error newCaptcha
         return result

@@ -11,13 +11,15 @@ open System.IO
 open System.Security.Cryptography
 
 let private fontArr = [|"Arial"; "Verdana"; "Times New Roman"|]
-let private colorArr = Color.WebSafePalette.ToArray()
+//let private colorArr = Color.WebSafePalette.ToArray()
 let private charArr = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890"
 let private rand = System.Random()
 let private backcolor = Color.AliceBlue
 let private textColor = Color.FromRgb(byte 45, byte 62, byte 80)
 let private fontsize = float32 40
 let private rotationDegree = 30
+let private imgHeight,imgWidth = float32 65, float32 400
+
 
 let createToken(size) =
     let mutable byteArr  = 
@@ -33,11 +35,11 @@ let createCaptchaString(length:int) =
 let createCaptchaImgBase64(captchaClear:string) =
     /// split captcha up a bit to spread it more evenly and avoid overlaps
     let captcha = captchaClear |> Seq.map string |> String.concat " "
-    let font = Fonts.SystemFonts.CreateFont(fontArr.[rand.Next(0,fontArr.Length-1)], fontsize, Fonts.FontStyle.Regular)
+    let font = Fonts.SystemFonts.CreateFont("Arial", fontsize, Fonts.FontStyle.Regular)
     let stringHeight, stringWidth = 
         let m = TextMeasurer.Measure(captcha, TextOptions(font))
         m.Height, m.Width
-    let imgHeight, imgWidth = stringHeight * float32 1.5, stringWidth * float32 2
+    //let imgHeight, imgWidth = stringHeight * float32 1.5, stringWidth * float32 2
     /// calculate effective horizontal start
     let startX = 
         let halfStringWidth = stringWidth / float32 2
@@ -84,8 +86,6 @@ let createCaptchaImgBase64(captchaClear:string) =
     let randomLine() =
         let n = rand.Next(2,6)
         let slize = imgWidth / float32 n
-        printfn "width: %A" imgWidth
-        printfn "n: %i; slize: %A" n slize
         Array.init (n+1) (fun i -> PointF(float32 i * slize, randomY()) )
 
     img.Mutate(fun x ->

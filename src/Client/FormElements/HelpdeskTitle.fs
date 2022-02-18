@@ -1,4 +1,4 @@
-module HelpdeskMain
+module HelpdeskMain.Title
 
 open Fable.React
 open Elmish
@@ -9,7 +9,7 @@ open IssueTypes
 open Feliz
 open Feliz.Bulma
 
-let topicList = [
+let private topicList = [
     IssueGeneralTopic.RDM
     IssueGeneralTopic.Infrastructure
     IssueGeneralTopic.Metadata
@@ -18,7 +18,7 @@ let topicList = [
     IssueGeneralTopic.Other
 ]
 
-let SwitchDropdownResponsivePX = 600.
+let private SwitchDropdownResponsivePX = 600.
 
 module ButtonDropdown =
 
@@ -104,6 +104,8 @@ module ButtonDropdown =
             prop.onClick(fun e ->
                 // prevent main element "dropdown toggle"
                 e.stopPropagation(); e.preventDefault()
+                /// This codeblock can be used to allow "onClick" add of the more topic.
+                /// I deemed it unintuitive and to increase maintainablity issues.
                 //if e.view.innerWidth < SwitchDropdownResponsivePX then
                 //     Msg.UpdateDropdownActiveTopic (Some block) |> dispatch
                 //else
@@ -296,7 +298,7 @@ module ButtonDropdown =
                                     Html.span [
                                         prop.style [style.marginRight (length.px 5)]
                                         prop.text (
-                                            let isMore = model.FormModel.IssueTopic.Value.toSubCategoryString = "More"
+                                            //let isMore = model.FormModel.IssueTopic.Value.toSubCategoryString = "More"
                                             if model.FormModel.IssueTopic.IsNone then
                                                 "Please select"
                                             else
@@ -334,94 +336,8 @@ module ButtonDropdown =
             ]
         ]
 
-let header =
-    Bulma.content [
-        prop.style [
-            style.backgroundColor NFDIColors.lightgray
-            style.padding (length.rem 1, length.rem 2)
-        ]
-        prop.children [
-            Bulma.content [
-                Bulma.media [
-                    Bulma.mediaLeft [
-                        Bulma.image [
-                            Bulma.image.is128x128
-                            prop.style [style.marginLeft 0]
-                            prop.children[
-                                Html.img [
-                                    prop.src "https://raw.githubusercontent.com/nfdi4plants/Branding/master/logos/DataPLANT/DataPLANT_logo_square_bg_darkblue.svg"
-                                ]
-                            ]
-                        ]
-                    ]
-                    Bulma.mediaContent [
-                        prop.style [
-                            style.margin.auto
-                        ]
-                        prop.children [
-                            Bulma.content [
-                                Html.h1 [
-                                    prop.style [
-                                        style.color "grey"
-                                    ]
-                                    prop.text "Submit a ticket"
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-            Bulma.content [
-                Html.h5 [
-                    prop.text "Please fill out this form to submit a new request to DataPLANT"
-                ]
-            ]
-        ]
-    ]
 
-let myCheckradio (model:Model) dispatch (name:string) (issueType:IssueType) =
-    [
-        let text = issueType.ToString()
-        let id = $"{name}{text}"
-        Checkradio.radio [
-            prop.id id
-            prop.name name
-            color.isBlack
-            checkradio.isCircle
-            prop.isChecked (model.FormModel.IssueType = issueType)
-            prop.onChange(fun (e:Browser.Types.Event) ->
-                let nextModel = {
-                    model.FormModel with
-                        IssueType = issueType
-                }
-                UpdateFormModel nextModel |> dispatch
-            )
-        ]
-        Html.label [ prop.htmlFor id; prop.text text ]
-    ]
-
-let issueTypeElement model dispatch =
-    Bulma.content [
-        Bulma.box [
-            Bulma.label [
-                Html.span "Type "
-                Html.span [
-                    prop.style [style.color NFDIColors.Red.Base]
-                    prop.text "*"
-                ]
-            ]
-            Bulma.field.div [
-                prop.style [style.justifyContent.spaceAround; style.display.flex]
-                prop.children [
-                    yield! myCheckradio model dispatch "radio1" IssueType.Question
-                    yield! myCheckradio model dispatch "radio1" IssueType.Bug
-                    yield! myCheckradio model dispatch "radio1" IssueType.Request
-                ]
-            ]
-        ]
-    ]
-
-let issuetitleInputElement model dispatch =
+let issueTitleElement model dispatch =
     Bulma.content [
         Bulma.box [
             Bulma.label [
@@ -454,113 +370,5 @@ let issuetitleInputElement model dispatch =
                     ]
                 ]
             ]
-        ]
-    ]
-
-let issueContentElement (model:Model) dispatch =
-    Bulma.content [
-        Bulma.box [
-            Bulma.label [
-                Html.span "Description "
-                Html.span [
-                    prop.style [style.color NFDIColors.Red.Base]
-                    prop.text "*"
-                ]
-            ]
-            Bulma.textarea [
-                prop.id InputIds.DescriptionInput
-                prop.placeholder "please describe your issue .."
-                prop.onChange(fun (e:Browser.Types.Event) ->
-                    let nextFormModel = {
-                        model.FormModel with
-                            IssueContent = e.Value
-                    }
-                    UpdateFormModel nextFormModel |> dispatch
-                )
-            ]
-        ]
-    ]
-
-let emailInput (model:Model) dispatch =
-    Bulma.content [
-        Bulma.box [
-            Bulma.label [
-                Html.p "Email"
-            ]
-            Bulma.help [
-                prop.text "If you want updates about your issue you can give us your email address. We will keep your contact information only as long as your issue is open."
-            ]
-            Bulma.control.div [
-                Bulma.control.hasIconsLeft
-                prop.children [
-                    Bulma.input.email [
-                        prop.id InputIds.EmailInput
-                        prop.placeholder "Email"
-                        prop.onChange(fun (e:Browser.Types.Event) ->
-                            let nextFormModel = {
-                                model.FormModel with
-                                    UserEmail = e.Value
-                            }
-                            UpdateFormModel nextFormModel |> dispatch
-                        )
-                    ]
-                    Html.span [
-                        prop.classes ["icon is-small is-left"]
-                        prop.children [
-                            Html.i [
-                                prop.className "fas fa-envelope"
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-    ]
-
-let captchaANDsubmit (model:Model) dispatch =
-    Bulma.content [
-        Bulma.box [
-            Bulma.field.div [
-                CaptchaClient.mainElement model dispatch
-            ]
-            Bulma.field.div [
-                // Submits
-                Bulma.button.button [
-                    let isActive = model.Captcha.IsSome && model.Captcha.Value.AccessToken <> ""
-                    prop.onClick (fun _ ->
-                        if isActive then dispatch SubmitIssueRequest else ()
-                    )
-                    prop.classes ["is-nfdidark"]
-                    if not isActive then Bulma.button.isStatic
-                    Bulma.button.isFullWidth
-                    prop.children [
-                        Html.span "Submit"
-                        Html.span [
-                            prop.classes ["icon is-small"]
-                            prop.children [
-                                Html.i [
-                                    prop.className "fa-solid fa-share"
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-    ]
-
-let mainElement (model: Model) (dispatch: Msg -> unit) =
-    Bulma.container [
-        prop.style [
-            //style.backgroundColor "whitesmoke"
-        ]
-        prop.children [
-            header
-            issueTypeElement model dispatch
-            issuetitleInputElement model dispatch
-            issueContentElement model dispatch
-            emailInput model dispatch
-            captchaANDsubmit model dispatch
-            //Html.div $"{model.FormModel}"
         ]
     ]

@@ -121,6 +121,8 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
                 (curry GenericError (Cmd.ofMsg <| UpdateCaptchaLoading false))
         nextModel, cmd
     | GetCaptchaResponse captcha ->
+        // clear captcha input
+        let _ = Browser.Dom.document.getElementById(InputIds.CaptchaInput)?value <- ""
         { model with
             Captcha = captcha
             CaptchaLoading = false

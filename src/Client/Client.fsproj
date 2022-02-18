@@ -14,8 +14,12 @@
         <Compile Include="Modal.fs" />
         <Compile Include="alerts.fs" />
         <Compile Include="nfdi-webcomponents.fs" />
-        <Compile Include="Captcha.fs" />
-        <Compile Include="HelpdeskMain.fs" />
+        <Compile Include="FormElements\HelpdeskCheckradio.fs" />
+        <Compile Include="FormElements\HelpdeskTitle.fs" />
+        <Compile Include="FormElements\HelpdeskDescription.fs" />
+        <Compile Include="FormElements\HelpdeskEmail.fs" />
+        <Compile Include="FormElements\HelpdeskCaptcha.fs" />
+        <Compile Include="FormElements\HelpdeskMain.fs" />
         <Compile Include="Index.fs" />
         <Compile Include="App.fs" />
     </ItemGroup>

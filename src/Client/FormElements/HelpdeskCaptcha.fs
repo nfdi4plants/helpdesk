@@ -18,6 +18,7 @@ let mainElement (model:Model) dispatch =
         if model.Captcha.IsSome then
             let src = "data:image/png;base64, " + model.Captcha.Value.ImageBase64
             Bulma.field.div [
+                prop.classes ["has-ratio"]
                 prop.style [style.textAlign.center]
                 prop.children [
                     Html.img [
