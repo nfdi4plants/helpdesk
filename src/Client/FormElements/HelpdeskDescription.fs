@@ -1,4 +1,4 @@
-module HelpdeskMain.Description
+module Description
 
 open Fable.React
 open Elmish

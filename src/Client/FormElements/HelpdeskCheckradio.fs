@@ -1,4 +1,4 @@
-module HelpdeskMain.Checkradio
+module Checkradio
 
 open State
 open IssueTypes

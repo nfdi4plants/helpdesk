@@ -1,4 +1,4 @@
-﻿
+
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,6 +6,7 @@
     <UserSecretsId>de50dd48-e691-4599-89ab-9d56efdaaafc</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Fonts\*.ttf" />
     <Compile Include="Version.fs" />
     <Compile Include="Captcha\CaptchaCreate.fs" />
     <Compile Include="Captcha\CaptchaStore.fs" />
@@ -14,8 +15,20 @@
     <None Include="paket.references" />
     <Compile Include="Server.fs" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Fonts\arial.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Fonts\times.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Fonts\verdana.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

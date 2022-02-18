@@ -98,10 +98,10 @@ let mainElement (model: Model) (dispatch: Msg -> unit) =
         ]
         prop.children [
             header
-            HelpdeskMain.Checkradio.issueTypeElement model dispatch
-            HelpdeskMain.Title.issueTitleElement model dispatch
-            HelpdeskMain.Description.issueContentElement model dispatch
-            HelpdeskMain.Email.userEmailElement model dispatch
+            Checkradio.issueTypeElement model dispatch
+            Title.issueTitleElement model dispatch
+            Description.issueContentElement model dispatch
+            Email.userEmailElement model dispatch
             captchaANDsubmit model dispatch
             //Html.div $"{model.FormModel}"
         ]

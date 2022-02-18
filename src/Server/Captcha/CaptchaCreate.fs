@@ -10,16 +10,25 @@ open System
 open System.IO
 open System.Security.Cryptography
 
-let private fontArr = [|"Arial"; "Verdana"; "Times New Roman"|]
+let private rand = System.Random()
+
 //let private colorArr = Color.WebSafePalette.ToArray()
 let private charArr = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890"
-let private rand = System.Random()
 let private backcolor = Color.AliceBlue
 let private textColor = Color.FromRgb(byte 45, byte 62, byte 80)
 let private fontsize = float32 40
 let private rotationDegree = 30
 let private imgHeight,imgWidth = float32 65, float32 400
 
+let fonts = new FontCollection()
+let arial = fonts.Add("./Fonts/arial.ttf")
+let verdana = fonts.Add("./Fonts/verdana.ttf")
+let times = fonts.Add("./Fonts/times.ttf")
+
+let rndfont(size:float32) =
+    let fontArr = [| arial; verdana; times |]
+
+    fontArr.[rand.Next(0,fontArr.Length-1)].CreateFont(size,Fonts.FontStyle.Regular)
 
 let createToken(size) =
     let mutable byteArr  = 
@@ -35,7 +44,7 @@ let createCaptchaString(length:int) =
 let createCaptchaImgBase64(captchaClear:string) =
     /// split captcha up a bit to spread it more evenly and avoid overlaps
     let captcha = captchaClear |> Seq.map string |> String.concat " "
-    let font = Fonts.SystemFonts.CreateFont("Arial", fontsize, Fonts.FontStyle.Regular)
+    let font = rndfont(fontsize)
     let stringHeight, stringWidth = 
         let m = TextMeasurer.Measure(captcha, TextOptions(font))
         m.Height, m.Width
@@ -61,7 +70,7 @@ let createCaptchaImgBase64(captchaClear:string) =
     /// create a new image object for each character in captcha. Can manipulate each letter then add it to img
     for c in captcha do
         let imgCharacter = new Image<Rgba32>(int imgWidth, int imgHeight)
-        let font = Fonts.SystemFonts.CreateFont(fontArr.[rand.Next(0,fontArr.Length-1)], fontsize, Fonts.FontStyle.Regular)
+        let font = rndfont(fontsize)
         let location = new PointF(position, startY);
         position <- position + TextMeasurer.Measure(c.ToString(), TextOptions(font)).Width
         let color = textColor //colors.[rand.Next(0,colors.Length-1)]

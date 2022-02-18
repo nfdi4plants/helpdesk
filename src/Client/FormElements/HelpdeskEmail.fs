@@ -1,4 +1,4 @@
-module HelpdeskMain.Email
+module Email
 
 open Fable.React
 open Elmish

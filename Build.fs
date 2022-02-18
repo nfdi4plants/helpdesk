@@ -56,7 +56,13 @@ Target.create "InstallClient" (fun _ -> run npm "install" ".")
 
 Target.create "Bundle" (fun _ ->
     [ "server", dotnet $"publish -c Release -o \"{deployPath}\"" serverPath
-      "client", dotnet "fable -o output -s --run webpack -p" clientPath ]
+      "client", dotnet "fable src\Client -s --run webpack --config webpack.config.js" "" ]
+    |> runParallel
+)
+
+Target.create "bundlelinux" (fun _ ->
+    [ "server", dotnet $"publish -c Release -r linux-x64 -o \"{deployPath}\"" serverPath
+      "client", dotnet "fable src\Client -s --run webpack --config webpack.config.js" "" ]
     |> runParallel
 )
 
@@ -65,7 +71,7 @@ Target.create "Run" (fun _ ->
     run dotnet "build" sharedPath
     openBrowser devUrl
     [ "server", dotnet "watch run" serverPath
-      "client", dotnet "fable watch src/Client -s --run webpack-dev-server" "" ]
+      "client", dotnet "fable watch src\Client -s --run webpack-dev-server" "" ]
     |> runParallel
 )
 
@@ -85,7 +91,11 @@ open Fake.Core.TargetOperators
 let dependencies = [
     "Clean"
         ==> "InstallClient"
-        ==> "Bundle"
+        ==> "bundlelinux"
+
+    "Clean"
+    ==> "InstallClient"
+    ==> "Bundle"
 
     "Clean"
         ==> "InstallClient"
@@ -95,6 +105,7 @@ let dependencies = [
         ==> "RunTests"
 
     "release"
+
 ]
 
 [<EntryPoint>]
