@@ -159,20 +159,6 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
 open Feliz
 open Feliz.Bulma
 
-let navBrand =
-    Bulma.navbarBrand.div [
-        Bulma.navbarItem.a [
-            prop.href "https://safe-stack.github.io/"
-            navbarItem.isActive
-            prop.children [
-                Html.img [
-                    prop.src "/favicon.png"
-                    prop.alt "Logo"
-                ]
-            ]
-        ]
-    ]
-
 let view (model: Model) (dispatch: Msg -> unit) =
     Bulma.hero [
         hero.isFullHeight
@@ -185,12 +171,19 @@ let view (model: Model) (dispatch: Msg -> unit) =
                 nfdi_webcomponents.nfdiNavbar [] []
             ]
             Bulma.heroBody [
-                Bulma.container [
-                    Bulma.column [
-                        column.is8
-                        column.isOffset2
+                prop.classes ["decrease-padding"]
+                prop.children [
+                    Bulma.container [
+                        prop.style [style.maxWidth (length.percent 100)]
                         prop.children [
-                            HelpdeskMain.mainElement model dispatch
+                            Bulma.column [
+                                column.is8
+                                column.isOffset2
+                                prop.classes ["decrease-padding"]
+                                prop.children [
+                                    HelpdeskMain.mainElement model dispatch
+                                ]
+                            ]
                         ]
                     ]
                 ]

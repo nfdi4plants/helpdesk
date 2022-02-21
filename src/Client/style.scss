@@ -744,3 +744,20 @@ body {
 /*.nested-dropdown div:hover {
     background-color: whitesmoke
 }*/
+
+@media only screen and (max-width: 400px) {
+    // need this for maximum mobile support
+
+    .decrease-padding {
+        padding: 0.25rem
+    }
+
+    .decrease-margin-bottom {
+        margin-bottom: 0.25rem !important
+    }
+
+    .min-flex-column {
+        display: flex;
+        flex-direction: column
+    }
+}

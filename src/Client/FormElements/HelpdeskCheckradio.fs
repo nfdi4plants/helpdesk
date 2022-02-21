@@ -6,14 +6,15 @@ open Feliz
 open Feliz.Bulma
 
 let private myCheckradio (model:Model) dispatch (name:string) (issueType:IssueType) =
-    [
+     Html.div [
         let text = issueType.ToString()
         let id = $"{name}{text}"
         Checkradio.radio [
             prop.id id
             prop.name name
-            color.isBlack
+            prop.classes ["is-nfdiolive"]
             checkradio.isCircle
+            color.isInfo
             prop.isChecked (model.FormModel.IssueType = issueType)
             prop.onChange(fun (e:Browser.Types.Event) ->
                 let nextModel = {
@@ -39,10 +40,12 @@ let issueTypeElement model dispatch =
             Bulma.field.div [
                 prop.style [style.justifyContent.spaceAround; style.display.flex]
                 prop.children [
-                    yield! myCheckradio model dispatch "radio1" IssueType.Question
-                    yield! myCheckradio model dispatch "radio1" IssueType.Bug
-                    yield! myCheckradio model dispatch "radio1" IssueType.Request
+                    myCheckradio model dispatch "radio1" IssueType.Question
+                    myCheckradio model dispatch "radio1" IssueType.Bug
+                    myCheckradio model dispatch "radio1" IssueType.Request
                 ]
+                //  Bulma.columns [
+                //  ]
             ]
         ]
     ]

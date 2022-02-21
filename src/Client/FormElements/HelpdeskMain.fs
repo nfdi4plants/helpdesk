@@ -18,29 +18,35 @@ let header =
         ]
         prop.children [
             Bulma.content [
-                Bulma.media [
-                    Bulma.mediaLeft [
-                        Bulma.image [
-                            Bulma.image.is128x128
-                            prop.style [style.marginLeft 0]
-                            prop.children[
-                                Html.img [
-                                    prop.src "https://raw.githubusercontent.com/nfdi4plants/Branding/master/logos/DataPLANT/DataPLANT_logo_square_bg_darkblue.svg"
+                prop.classes ["decrease-margin-bottom"]
+                prop.children [
+                    Bulma.media [
+                        prop.classes ["min-flex-column"]
+                        prop.children [
+                            Bulma.mediaLeft [
+                                Bulma.image [
+                                    Bulma.image.is128x128
+                                    prop.style [style.marginLeft 0; style.marginRight 0]
+                                    prop.children[
+                                        Html.img [
+                                            prop.src "https://raw.githubusercontent.com/nfdi4plants/Branding/master/logos/DataPLANT/DataPLANT_logo_square_bg_darkblue.svg"
+                                        ]
+                                    ]
                                 ]
                             ]
-                        ]
-                    ]
-                    Bulma.mediaContent [
-                        prop.style [
-                            style.margin.auto
-                        ]
-                        prop.children [
-                            Bulma.content [
-                                Html.h1 [
-                                    prop.style [
-                                        style.color "grey"
+                            Bulma.mediaContent [
+                                prop.style [
+                                    style.margin.auto
+                                ]
+                                prop.children [
+                                    Bulma.content [
+                                        Html.h1 [
+                                            prop.style [
+                                                style.color "grey"
+                                            ]
+                                            prop.text "Submit a ticket"
+                                        ]
                                     ]
-                                    prop.text "Submit a ticket"
                                 ]
                             ]
                         ]
@@ -94,7 +100,7 @@ let captchaANDsubmit (model:Model) dispatch =
 let mainElement (model: Model) (dispatch: Msg -> unit) =
     Bulma.container [
         prop.style [
-            //style.backgroundColor "whitesmoke"
+            //style.maxWidth (length.percent 100)
         ]
         prop.children [
             header
