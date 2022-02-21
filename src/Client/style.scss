@@ -745,6 +745,14 @@ body {
     background-color: whitesmoke
 }*/
 
+@media only screen and (min-width: 400px) {
+
+    // need this for maximum mobile support
+    .min-hide-opposite {
+        display: none !important
+    }
+}
+
 @media only screen and (max-width: 400px) {
     // need this for maximum mobile support
 
@@ -760,4 +768,9 @@ body {
         display: flex;
         flex-direction: column
     }
+
+    .min-hide {
+        display: none !important
+    }
+
 }

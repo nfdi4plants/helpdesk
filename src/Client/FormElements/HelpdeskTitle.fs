@@ -301,16 +301,38 @@ module ButtonDropdown =
                                 )
                                 prop.children [
                                     Html.span [
-                                        prop.style [style.marginRight (length.px 5)]
-                                        prop.text (
-                                            //let isMore = model.FormModel.IssueTopic.Value.toSubCategoryString = "More"
-                                            if model.FormModel.IssueTopic.IsNone then
-                                                "Please select"
-                                            else
-                                                model.FormModel.IssueTopic.Value.toSubCategoryString
-                                        )
+                                        prop.classes ["min-hide"]
+                                        prop.children [
+                                            Html.span [
+                                                prop.style [style.marginRight (length.px 5)]
+                                                prop.text (
+                                                    //let isMore = model.FormModel.IssueTopic.Value.toSubCategoryString = "More"
+                                                    if model.FormModel.IssueTopic.IsNone then
+                                                        "Please select"
+                                                    else
+                                                        model.FormModel.IssueTopic.Value.toSubCategoryString
+                                                )
+                                            ]
+                                            Html.i [ prop.className "fa-solid fa-angle-down" ]
+                                        ]
                                     ]
-                                    Html.i [ prop.className "fa-solid fa-angle-down" ]
+                                    Html.span [
+                                        prop.classes ["min-hide-opposite"]
+                                        prop.children [
+                                            Html.span [
+                                                prop.style [style.marginRight (length.px 5)]
+                                                prop.text (
+                                                    //let isMore = model.FormModel.IssueTopic.Value.toSubCategoryString = "More"
+                                                    if model.FormModel.IssueTopic.IsNone then
+                                                        "Select"
+                                                    else
+                                                        model.FormModel.IssueTopic.Value.toSubCategoryString.Split([|" "|], System.StringSplitOptions.RemoveEmptyEntries)
+                                                        |> Array.map (fun x -> string x.[0]) |> String.concat ""
+                                                )
+                                            ]
+                                            Html.i [ prop.className "fa-solid fa-angle-down" ]
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]
