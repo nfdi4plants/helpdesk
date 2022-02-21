@@ -100,7 +100,12 @@ module ButtonDropdown =
             ]
             prop.onMouseOver(fun e -> if e.view.innerWidth > SwitchDropdownResponsivePX then Msg.UpdateDropdownActiveTopic (Some block) |> dispatch )
             prop.onMouseOut(fun e -> if e.view.innerWidth > SwitchDropdownResponsivePX then Msg.UpdateDropdownActiveTopic (None) |> dispatch)
-            // Only choose "More" when user actively clicks on 
+            // Only choose "More" when user actively clicks on
+            prop.onTouchEnd(fun e ->
+                e.stopPropagation(); e.preventDefault()
+                if e.view.innerWidth < SwitchDropdownResponsivePX then
+                     Msg.UpdateDropdownActiveTopic (Some block) |> dispatch
+            )
             prop.onClick(fun e ->
                 // prevent main element "dropdown toggle"
                 e.stopPropagation(); e.preventDefault()

@@ -129,7 +129,8 @@ module.exports = {
         static: {
             directory: resolve(CONFIG.assetsDir),
             publicPath: '/'
-        }
+        },
+        allowedHosts: 'all',
     },
     // - sass-loaders: transforms SASS/SCSS into JS
     // - file-loader: Moves files referenced in the code (fonts, images) into output folder

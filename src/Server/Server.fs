@@ -69,8 +69,8 @@ let app =
 app
     .ConfigureAppConfiguration(
         System.Action<Microsoft.Extensions.Hosting.HostBuilderContext,IConfigurationBuilder> ( fun ctx config ->
-            config.AddUserSecrets("de50dd48-e691-4599-89ab-9d56efdaaafc")   |> ignore
             config.AddJsonFile("helpdesk_config.json",true,true)            |> ignore
+            config.AddUserSecrets("de50dd48-e691-4599-89ab-9d56efdaaafc")   |> ignore
         )
 )
 |> run

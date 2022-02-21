@@ -21,6 +21,26 @@ docker run -it -p 8085:8085 nfdi-helpdesk
 docker tag nfdi-helpdesk:latest freymaurer/nfdi-helpdesk:X.X.X
 ```
 
+### Bundle
+
+#### Fonts for captcha creation
+
+Add fonts as itemgroup to Server.fsproj as such:
+
+```xml
+<ItemGroup>
+    <Content Update="Fonts\arial.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Fonts\times.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Fonts\verdana.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+```
+
 Remember to replace "X.X.X" with the correct next SemVer version.
 
 4. Psuh the image
