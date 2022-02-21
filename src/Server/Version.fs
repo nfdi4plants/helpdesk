@@ -4,10 +4,10 @@ open System.Reflection
 
 [<assembly: AssemblyTitleAttribute("nfdi-helpdesk")>]
 [<assembly: AssemblyVersionAttribute("0.1.0")>]
-[<assembly: AssemblyMetadataAttribute("ReleaseDate","04.02.2022")>]
+[<assembly: AssemblyMetadataAttribute("ReleaseDate","21.02.2022")>]
 do ()
 
 module internal AssemblyVersionInformation =
     let [<Literal>] AssemblyTitle = "nfdi-helpdesk"
     let [<Literal>] AssemblyVersion = "0.1.0"
-    let [<Literal>] AssemblyMetadata_ReleaseDate = "04.02.2022"
+    let [<Literal>] AssemblyMetadata_ReleaseDate = "21.02.2022"
