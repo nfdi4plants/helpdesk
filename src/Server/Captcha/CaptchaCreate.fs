@@ -28,7 +28,7 @@ let times = fonts.Add("./Fonts/times.ttf")
 let rndfont(size:float32) =
     let fontArr = [| arial; verdana; times |]
 
-    fontArr.[rand.Next(0,fontArr.Length-1)].CreateFont(size,Fonts.FontStyle.Regular)
+    fontArr.[rand.Next(0,fontArr.Length)].CreateFont(size,Fonts.FontStyle.Regular)
 
 let createToken(size) =
     let mutable byteArr  = 
@@ -39,7 +39,7 @@ let createToken(size) =
     |> System.Convert.ToBase64String
 
 let createCaptchaString(length:int) =
-    String.init length (fun i -> string charArr.[rand.Next(0,charArr.Length-1)])
+    String.init length (fun i -> string charArr.[rand.Next(0,charArr.Length)])
 
 let createCaptchaImgBase64(captchaClear:string) =
     /// split captcha up a bit to spread it more evenly and avoid overlaps
@@ -82,7 +82,7 @@ let createCaptchaImgBase64(captchaClear:string) =
 
         imgCharacter.Mutate(fun x ->
             x.Transform(
-                let rndRotationDegree = rand.Next(-rotationDegree,rotationDegree) |> float32
+                let rndRotationDegree = rand.Next(-rotationDegree,rotationDegree + 1) |> float32
                 let rotationLocation = System.Numerics.Vector2(position, startY)// new PointF(position,startY)
                 builder.PrependRotationDegrees(rndRotationDegree, rotationLocation) 
             ) |> ignore
@@ -91,9 +91,9 @@ let createCaptchaImgBase64(captchaClear:string) =
         img.Mutate(fun x -> x.DrawImage(imgCharacter, float32 1) |> ignore ) 
         imgCharacter.Dispose()
 
-    let randomY() = rand.Next(0, int imgHeight) |> float32
+    let randomY() = rand.Next(0, int imgHeight + 1) |> float32
     let randomLine() =
-        let n = rand.Next(2,6)
+        let n = rand.Next(2,6 + 1)
         let slize = imgWidth / float32 n
         Array.init (n+1) (fun i -> PointF(float32 i * slize, randomY()) )
 
