@@ -43,7 +43,7 @@ dotnet run -- RunTests
 
 1. Create image 
 ```bash
-docker build -t nfdi-helpdesk
+docker build -t nfdi-helpdesk .
 ```
 
 2. Test image 
