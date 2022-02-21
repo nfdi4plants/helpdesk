@@ -1,6 +1,7 @@
-### 0.1.0+f0414cc (Released 2022-2-21)
+### 1.0.0+11a70d2 (Released 2022-2-21)
 * Additions:
-    * latest commit #f0414cc
+    * latest commit #11a70d2
+    * [[#11a70d2](https://github.com/Freymaurer/nfdi-helpdesk/commit/11a70d245d15c3ace5a53e3050a46ba36a2383bd)] Update README.md with dev info
     * [[#32500d4](https://github.com/Freymaurer/nfdi-helpdesk/commit/32500d4ab00a1c1fa5bd01b1c001ff272e9b13a2)] Update build.fs entry to allow multiple arguments
     * [[#6fd26a4](https://github.com/Freymaurer/nfdi-helpdesk/commit/6fd26a47f409046bbe2554ceea5321c57b9accf8)] design categories as dropdown
     * [[#623ce6d](https://github.com/Freymaurer/nfdi-helpdesk/commit/623ce6d56da8f974c6c9ca713aa31c8646f5d040)] Update @nfdi4plants/web-components :arrow_up:
