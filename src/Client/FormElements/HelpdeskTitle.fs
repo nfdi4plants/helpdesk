@@ -22,6 +22,17 @@ let private SwitchDropdownResponsivePX = 600.
 
 module ButtonDropdown =
 
+    let private updateFormWithTopic (model:Model) dispatch (topic:Topic) =
+        ToggleIssueCategoryDropdown |> dispatch
+        let nextModel = {
+            model.FormModel with
+                IssueTopic = Some topic
+        }
+        /// Update url for easier url generation
+        let pathName = $"/?topic={topic.toUrlString}"
+        Browser.Dom.window.history.replaceState("",url = pathName)
+        UpdateFormModel nextModel |> dispatch
+
     let private backResponsiveDropdownItem (model:Model) dispatch =
         Bulma.dropdownItem.a [
             prop.onClick(fun e -> e.stopPropagation(); UpdateDropdownActiveTopic None |> dispatch)
@@ -76,16 +87,8 @@ module ButtonDropdown =
                             prop.onMouseOut(fun _ -> Msg.UpdateDropdownActiveSubtopic (None) |> dispatch)
                             prop.onClick (fun e ->
                                 // prevent main element "dropdwon toggle"
-                                e.stopPropagation()
-                                ToggleIssueCategoryDropdown |> dispatch
-                                let nextModel = {
-                                    model.FormModel with
-                                        IssueTopic = Some topic
-                                }
-                                /// Update url for easier url generation
-                                let pathName = $"/?topic={topic.toUrlString}"
-                                Browser.Dom.window.history.replaceState("",url = pathName)
-                                UpdateFormModel nextModel |> dispatch
+                                e.stopPropagation(); e.preventDefault()
+                                updateFormWithTopic model dispatch topic
                             )
                             prop.text subCText
                         ]
@@ -103,8 +106,10 @@ module ButtonDropdown =
             // Only choose "More" when user actively clicks on
             prop.onTouchEnd(fun e ->
                 e.stopPropagation(); e.preventDefault()
-                if e.view.innerWidth < SwitchDropdownResponsivePX then
-                     Msg.UpdateDropdownActiveTopic (Some block) |> dispatch
+                if e.view.innerWidth < SwitchDropdownResponsivePX && block <> IssueGeneralTopic.Other then
+                    Msg.UpdateDropdownActiveTopic (Some block) |> dispatch
+                elif e.view.innerWidth < SwitchDropdownResponsivePX && block = IssueGeneralTopic.Other then
+                    updateFormWithTopic model dispatch Topic.Other
             )
             prop.onClick(fun e ->
                 // prevent main element "dropdown toggle"
@@ -123,15 +128,7 @@ module ButtonDropdown =
                 //        | IssueGeneralTopic.Workflows           -> Topic.Workflows IssueSubtopics.Workflows.More
                 //        | IssueGeneralTopic.Other               -> Topic.Other
                 if block = IssueGeneralTopic.Other then
-                    ToggleIssueCategoryDropdown |> dispatch
-                    /// Update url for easier url generation
-                    let pathName = $"/?topic={Topic.Other.toUrlString}"
-                    Browser.Dom.window.history.replaceState("",url = pathName)
-                    let nextModel = {
-                        model.FormModel with
-                            IssueTopic = Some Topic.Other
-                    }
-                    UpdateFormModel nextModel |> dispatch
+                    updateFormWithTopic model dispatch Topic.Other
             )
             prop.children [
                 Html.span [
