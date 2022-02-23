@@ -1,3 +1,11 @@
+### 1.1.0+61e8147 (Released 2022-2-23)
+* Additions:
+    * latest commit #61e8147
+    * [[#7d59712](https://github.com/Freymaurer/nfdi-helpdesk/commit/7d5971235c89ed8d6c8e1999cb45d49cdc256bdb)] Add info for localtunnel :books:
+* Bugfixes:
+    * [[#c45deab](https://github.com/Freymaurer/nfdi-helpdesk/commit/c45deabec23a2707da259e4fca3ce74f0a6fbe35)] Fix old link in nfdi4plants navbar :arrow_up:
+    * [[#37c7724](https://github.com/Freymaurer/nfdi-helpdesk/commit/37c772482c7914f1905010406755268ec91bb959)] Fix mobile device onTouch bug (Issue #8). :bug:
+
 ### 1.0.0+11a70d2 (Released 2022-2-21)
 * Additions:
     * latest commit #11a70d2
