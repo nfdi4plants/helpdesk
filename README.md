@@ -6,7 +6,6 @@ This template can be used to generate a full-stack web application using the [SA
 
 ### Run in development
 
-
 #### Install pre-requisites
 
 You'll need to install the following pre-requisites in order to build SAFE applications
@@ -31,6 +30,20 @@ dotnet run
 Then open `http://localhost:8080` in your browser.
 
 The build project in root directory contains a couple of different build targets. You can specify them after `--` (target name is case-insensitive).
+
+#### Test on native mobile device
+
+Install [localtunnel](https://github.com/localtunnel/localtunnel)
+
+```bash
+npm install -g localtunnel
+```
+
+Open port on localtunnel api
+
+```bash
+lt --port 8080
+```
 
 **Tests not implemented**
 
