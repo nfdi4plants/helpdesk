@@ -54,6 +54,17 @@ dotnet run -- RunTests
 ```
 ### Docker Publish
 
+Start docker then use: 
+
+```bash 
+dotnet run docker-publish
+```
+
+__OR__
+
+<details><summary>Step by step</summary>
+<p>
+
 1. Create image 
 ```bash
 docker build -t nfdi-helpdesk .
@@ -75,6 +86,9 @@ Remember to replace "X.X.X" with the correct next SemVer version.
 ```bash
 docker push freymaurer/nfdi-helpdesk:X.X.X
 ```
+
+</p>
+</details>
 
 ### Bundle
 
