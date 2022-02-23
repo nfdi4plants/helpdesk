@@ -47,6 +47,59 @@ module ReleaseNoteTasks =
         Trace.trace "Update Version.fs done!"
     )
 
+module Docker =
+    
+    open Fake.Extensions.Release
+
+    let dockerImageName = "freymaurer/nfdi-helpdesk"
+
+    Target.create "docker-publish" (fun _ ->
+        let releaseNotesPath = "RELEASE_NOTES.md"
+        let port = "8085"
+
+        Release.exists()
+        let newRelease = ReleaseNotes.load releaseNotesPath
+        let check = Fake.Core.UserInput.getUserInput($"Is version {newRelease.SemVer.Major}.{newRelease.SemVer.Minor}.{newRelease.SemVer.Patch} correct? (y/n/true/false)" )
+
+        let dockerCreateImage() = run docker "build -t nfdi-helpdesk ." ""
+        let dockerTestImage() = run docker $"run -it -p {port}:{port} nfdi-helpdesk" ""
+        let dockerTagImage() =
+            run docker $"tag nfdi-helpdesk:latest {dockerImageName}:{newRelease.SemVer.Major}.{newRelease.SemVer.Minor}.{newRelease.SemVer.Patch}" ""
+            run docker $"tag nfdi-helpdesk:latest {dockerImageName}:latest" ""
+        let dockerPushImage() =
+            run docker $"push {dockerImageName}:{newRelease.SemVer.Major}.{newRelease.SemVer.Minor}.{newRelease.SemVer.Patch}" ""
+            run docker $"push {dockerImageName}:latest" ""
+        let dockerPublish() =
+            Trace.trace $"Tagging image with :latest and :{newRelease.SemVer.Major}.{newRelease.SemVer.Minor}.{newRelease.SemVer.Patch}"
+            dockerTagImage()
+            Trace.trace $"Pushing image to dockerhub with :latest and :{newRelease.SemVer.Major}.{newRelease.SemVer.Minor}.{newRelease.SemVer.Patch}"
+            dockerPushImage()
+        /// Check if next SemVer is correct
+        match check with
+        | "y"|"true"|"Y" ->
+            Trace.trace "Perfect! Starting with docker publish"
+            Trace.trace "Creating image"
+            dockerCreateImage()
+            /// Check if user wants to test image
+            let testImage = Fake.Core.UserInput.getUserInput($"Want to test the image? (y/n/true/false)" )
+            match testImage with
+            | "y"|"true"|"Y" ->
+                Trace.trace $"Your app on port {port} will open on localhost:{port}."
+                dockerTestImage()
+                /// Check if user wants the image published
+                let imageWorkingCorrectly = Fake.Core.UserInput.getUserInput($"Is the image working as intended? (y/n/true/false)" )
+                match imageWorkingCorrectly with
+                | "y"|"true"|"Y"    -> dockerPublish()
+                | "n"|"false"|"N"   -> Trace.traceErrorfn "Cancel docker-publish"
+                | anythingElse      -> failwith $"""Could not match your input "{anythingElse}" to a valid input. Please try again."""
+            | "n"|"false"|"N"   -> dockerPublish()
+            | anythingElse      -> failwith $"""Could not match your input "{anythingElse}" to a valid input. Please try again."""
+        | "n"|"false"|"N" ->
+            Trace.traceErrorfn "Please update your SemVer Version in %s" releaseNotesPath
+        | anythingElse -> failwith $"""Could not match your input "{anythingElse}" to a valid input. Please try again."""
+
+    )
+
 Target.create "Clean" (fun _ ->
     Shell.cleanDir deployPath
     run dotnet "fable clean --yes" clientPath // Delete *.fs.js files created by Fable
@@ -105,6 +158,8 @@ let dependencies = [
         ==> "RunTests"
 
     "release"
+
+    "docker-publish"
 
 ]
 
