@@ -58,7 +58,7 @@ type Form.Model with
             // bucket
             let bucketName = target.TypeBucketMap.[this.IssueType]
             let bucketId = bucketsMap.[bucketName]
-            let updatedTitle = $"{this.IssueTopic.Value.toSubCategoryString} | {this.IssueType} | {this.IssueTitle}"
+            let updatedTitle = $"{this.IssueTopic.Value.toCategoryString} {this.IssueTopic.Value.toSubCategoryString} | {this.IssueType} | {this.IssueTitle}"
             let task = 
                 createPlanTask planId bucketId updatedTitle
             // add labels if existing
@@ -96,9 +96,7 @@ let private sendPlanTask (graphClient:GraphServiceClient) (planTask:PlannerTask)
         return graphClient.Planner.Tasks.Request().AddAsync(planTask)
     }
 
-// #######
-// Example
-    
+   
 let createPlannerTaskInTeams (formModel:Form.Model, ctx:HttpContext) =
     let authCodeCredential = Targets.MSTeams.getMSModel ctx
     let graphApi = initGraphClient scopes authCodeCredential
