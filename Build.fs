@@ -120,9 +120,10 @@ Target.create "bundlelinux" (fun _ ->
 )
 
 // https://github.com/MangelMaxime/fulma-demo/blob/master/build.fsx
-Target.create "Run" (fun _ ->
+Target.create "Run" (fun config ->
+    let args = config.Context.Arguments
     run dotnet "build" sharedPath
-    openBrowser devUrl
+    if args |> List.contains "--open" then openBrowser devUrl
     [ "server", dotnet "watch run" serverPath
       "client", dotnet "fable watch src\Client -s --run webpack-dev-server" "" ]
     |> runParallel
