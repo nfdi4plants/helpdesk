@@ -19,3 +19,4 @@ release.sh
 *.DotSettings.user
 /ids.json
 /src/Server/helpdesk_config.json
+/src/Server/Application.db

@@ -17,3 +17,6 @@ type IHelpdeskAPI = {
     checkCaptcha: CaptchaTypes.ClientCaptcha ->Async<Result<CaptchaTypes.ClientCaptcha,CaptchaTypes.ClientCaptcha>>
 }
 
+type ILoggerAPI = {
+    getAllLogs : unit -> Async<string []>
+}

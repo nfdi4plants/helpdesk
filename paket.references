@@ -1,3 +1,4 @@
 FSharp.Core
 Azure.Identity
 SixLabors.ImageSharp
+Microsoft.Data.Sqlite

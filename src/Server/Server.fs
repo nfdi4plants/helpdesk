@@ -52,148 +52,206 @@ let errorHandler (ex:exn) (routeInfo:RouteInfo<HttpContext>) =
     let msg = sprintf "%A %s @%s." ex.Message System.Environment.NewLine routeInfo.path
     Propagate msg
 
-/// doesn't do anything?
-let logger = printfn "TEST %A"
+open FabulousMinutes
 
 let webApp =
     Remoting.createApi ()
     |> Remoting.withRouteBuilder Route.builder
     |> Remoting.fromContext api
     |> Remoting.withErrorHandler errorHandler
-    |> Remoting.withDiagnosticsLogger(logger)
     |> Remoting.buildHttpHandler
+    |> Logger(LoggerFunctions.sqliteLogger).BindToHttpHandler
 
-////// Enable logging on an exisiting HttpHandler 
-//let webAppWithLogging = SerilogAdapter.Enable(webApp)
+open Giraffe.ViewEngine
 
-open FSharp.Control.Tasks
-open System
-open System.IO
-open DynamicObj
-open Newtonsoft.Json
+module RawJS =
 
-let dynamicAccess(dynObject:DynamicObj, accessStr:string) =
-    let toDynArr = accessStr.Split(".")
-    printfn "dynArr = %A" toDynArr
-    let rec access (ind:int) (dynArr:string []) result =
-        if ind >= dynArr.Length then
-            printfn "1"
-            result
-        elif ind <> 0 && result = None then
-            printfn "2"
-            None
-        else
-            printfn "3"
-            let obj = if ind = 0 then dynObject else result.Value :> obj :?> DynamicObj
-            let next = obj.TryGetValue(dynArr.[ind])
-            access (ind+1) dynArr next
-    access 0 toDynArr None
+    let private deleteTableErrorHtml = """<div class="notification is-danger"> Unable to find logs. </div>"""
 
-/// https://csbiology.github.io/DynamicObj/
-type Logger() =
-    inherit DynamicObj()
+    let deleteRequest (url:string) =
+        sprintf
+            """
+            function deleteRequest() {
+                fetch('%s', {method: 'DELETE',})
+                    .then(async response => {
+                        const isJson = response.headers.get('content-type')?.includes('application/json');
+                        const data = isJson && await response.json();
 
-    static member init(?props) =
-        let t = Logger()
-        if props.IsSome then
-            props.Value |> List.iter t.setProp
-            t
-        else
-            t.setProp("", None)
-            t
-            
-    member this.setProp(key,value) = DynObj.setValueOpt this key value
+                        // check for error response
+                        if (!response.ok) {
+                            // get error message from body or default to response status
+                            const error = (data && data.message) || response.status;
+                            return Promise.reject(error);
+                        }
 
-    /// has issues with nested objects?
-    member this.print() = DynObj.print this
+                        window.location.href = '/logging';
+                    })
+                    .catch(error => {
+                        const element = document.getElementById('error_msg');
+                        element.innerHTML = '%s'
+                        console.error('There was an error!', error);
+                    });
+            };
+            """ url deleteTableErrorHtml
 
-    member this.toJson() = this |> JsonConvert.SerializeObject
+module Views =
 
-    member this.ofJson(json:string) =
-        let reader = new JsonTextReader(new StringReader(json))
-        failwith "Logger.ofJson is not implemented yet"
+    let container attr child = div [_class "container"; yield! attr] child
 
-    member this.ofHttpHandler(app:HttpHandler) =
-        let st = System.DateTime.Now.ToUniversalTime()
-        fun (next:HttpFunc) (ctx:HttpContext) ->
-            task {
-                use reader = new StreamReader(ctx.Request.Body)
-                /// This will empty 'ctx.Request.Body', which we will have to reinsert afterwards
-                let! body = reader.ReadToEndAsync()
-                let nextSTREAM =
-                    let toBytes = System.Text.Encoding.UTF8.GetBytes(body)
-                    new MemoryStream(toBytes)
-                //printfn "Text %A" text
-                /// return stream back to body so our Fable.Remoting actually has parameters to work with
-                ctx.Request.Body <- nextSTREAM
-                let! result = app next ctx
-                let response =
-                    [
-                        "StatusCode", string result.Value.Response.StatusCode
-                        "Time", (System.DateTime.Now.ToUniversalTime() - st).ToString()
-                    ]
-                    |> List.map (fun x -> fst x, snd x |> Some)
-                let request =
-                    let query =
-                        let queryLogger = Logger()
-                        ctx.Request.Query |> Seq.iter (fun x -> queryLogger.setProp(x.Key, Some x.Value) )
-                        queryLogger
-                    let headers =
-                        let queryLogger = Logger()
-                        ctx.Request.Headers |> Seq.iter (fun x -> queryLogger.setProp(x.Key, x.Value |> String.concat "," |> Some ) )
-                        queryLogger 
-                    let userAgent =
-                        ctx.Request.Headers
-                        |> Seq.tryFind (fun x -> x.Key ="User-Agent")
-                        |> Option.map (fun x -> x.Value |> String.concat ",")
-                        |> Option.defaultValue ""
-                    let contentType =
-                        ctx.Request.Headers
-                        |> Seq.tryFind (fun x -> x.Key ="Content-Type")
-                        |> Option.map (fun x -> x.Value |> String.concat ",")
-                        |> Option.defaultValue ""
-                    [
-                        "Path", box ctx.Request.Path
-                        "PathBase", box ctx.Request.PathBase
-                        "Method", box ctx.Request.Method
-                        "Host", box ctx.Request.Host.Host
-                        "Port",
-                            if ctx.Request.Host.Port.HasValue then string ctx.Request.Host.Port.Value else ""
-                            |> box
-                        "QueryString",
-                            if ctx.Request.QueryString.HasValue then string ctx.Request.Host.Port.Value else ""
-                            |> box
-                        "Query", if ctx.Request.Query.Count > 0 then box query else null
-                        "Headers", if ctx.Request.Headers.Count > 0 then box headers else null
-                        "UserAgent", box userAgent
-                        "ContentType", box contentType
-                        "Body", box body
-                    ]
-                    |> List.map (fun x -> fst x, snd x |> Some)
-                let logger =
-                    let props =
-                        [
-                            "Timestamp", st.ToString("yyyy.MM.dd hh:mm:ss.fffff") |> box
-                            "Request", Logger.init(request) |> box
-                            "Response", Logger.init(response) |> box
+    let navbarItem attr child = a [_class "navbar-item"; yield! attr] child
+
+    let content attr child = div [_class "content"; yield! attr] child
+
+    let masterpage subPageContent =
+        html [_class "has-navbar-fixed-top"] [
+            head [] [
+                meta [_charset "utf-8"]
+                meta [_name "viewport"; _content "width=device-width, initial-scale=1"]
+                title [] [rawText "fabulous-minutes"]
+                link [_rel "stylesheet"; _href @"https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"]
+                style [_type "text/css"; _media "screen"] [
+                    rawText """
+                        #wrapper {
+                            display: flex;
+                            min-height: 80vh;
+                            flex-direction: column
+                        }
+                    """
+                ]
+            ]
+            body [] [
+                // navbar
+                nav [_class "navbar is-link is-fixed-top"] [
+                    container [] [
+                        div [_class "navbar-brand"] [
+                            a [_class "navbar-item"; _href "/logging"] [strong [_style "color: white !important; font-size: 22px"] [rawText "Fabulous-Minutes"]]
+                            span [_class "navbar-burger"; attr "data-target" "navbarMenuHeroA"] [
+                                span [] []
+                                span [] []
+                                span [] []
+                            ] 
                         ]
-                        |> List.map (fun x -> fst x, snd x |> Some)
-                    Logger.init(props)
-                logger.toJson() |> printfn "%A"
+                        div [_id "navbarMenuHeroA"; _class "navbar-menu"] [
+                            div [_class "navbar-start"] [
+                                navbarItem [_href "/"] [rawText "Main Page"]
+                                div [_class "navbar-item has-dropdown is-hoverable"] [
+                                    a [_class "navbar-link"] [rawText "Logs"]
+                                    div [_class "navbar-dropdown"] [
+                                        for table in LoggerFunctions.LoggerRead.getAllLoggerTables() do
+                                            let l = sprintf "/logging/logs/%s" table
+                                            yield navbarItem [_href l] [rawText table]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+                // content
+                div [_id "wrapper"] [
+                    section [_class "section"; _style "flex: 1"] [
+                        container [] [
+                            subPageContent
+                        ]
+                    ]
+                ]
+                // footer
+                footer [_class "footer"] [
+                    div [_class "content has-text-centered"] [
+                        p [] [
+                            rawText "Built with "
+                            strong [] [rawText "BULMA "]
+                            img [_src "https://bulma.io/assets/Bulma%20Icon.svg"; _width "10"]
+                            rawText ", "
+                            strong [] [rawText "Giraffe 🦒"]
+                            rawText " and "
+                            strong [] [rawText "F# |> ❤️"]
+                            rawText ""
+                            rawText "."
+                        ]
+                    ]
+                ]
+            ]
+        ]
 
-                //let testDynAccess = dynamicAccess(logger,"Request.Headers.Cookie")
-                //printfn "%A" testDynAccess
-                return result
-            }
+    let index =
+        content [] [
+            h1 [] [rawText "Hello! 📚"]
+            p [] [rawText "Go ahead and check out the logs written by fabulous-minutes!"]
+        ]
 
-/// https://github.dev/Zaid-Ajaj/Giraffe.SerilogExtensions/blob/master/src/Giraffe.SerilogExtensions/SerilogAdapter.fs
-let apiLogger (app:HttpHandler) =
-    Logger().ofHttpHandler(app)
+    let logsPage (logsPath:string) =
+        let js = RawJS.deleteRequest logsPath
+        let tables() = LoggerFunctions.LoggerRead.getAllLoggerTables()
+        // do this to avoid sql injection in 'getLogFromTableCommand' 
+        if List.contains logsPath (tables()) then
+            let logColNames, logs = LoggerFunctions.LoggerRead.getLogsFromTable logsPath
+            div [] [
+                script [_type "application/javascript"] [
+                    rawText js
+                ]
+                h3 [_class "title is-4 is-spaced"] [rawText logsPath]
+                div [_class "field"; _id "error_msg"] []
+                div [_class "field"] [
+                    a [_onclick "deleteRequest();"; _class "button is-danger"; _style "margin-left: auto; width: 100px; display: block"] [
+                        str "delete"
+                    ]
+                ]
+                div [_class "table-container"] [
+                    table [_class "table is-striped is-hoverable is-fullwidth"] [
+                        thead [] [tr [] [
+                            for column in logColNames do
+                                yield th [] [rawText column]
+                        ]]
+                        tfoot [] [tr [] [
+                            for column in logColNames do
+                                yield th [] [rawText column]
+                        ]]
+                        tbody [] [
+                            for log in logs do
+                                yield tr [] [
+                                    for col in log do yield td [] [rawText (string col)]
+                                ]
+                        ]
+                    ]
+                ]
+            ]
+        else
+            div [_class "notification is-danger"] [
+                rawText $"Unable to find logs for '{logsPath}'."
+            ]
+            
+
+open Saturn
+
+module Controller =
+    let home =
+        htmlView (Views.masterpage <| Views.index)
+
+    let logsPage p =
+        htmlView (Views.masterpage <| Views.logsPage p)
+
+    let loggingRouter = router {
+        get "" home
+        getf "/logs/%s" logsPage
+        deletef "/logs/%s" (fun x ->
+            match LoggerFunctions.LoggerWrite.deleteLogTable x with
+            | 0 ->
+                json "{Success!}"
+            | anyElse ->
+                json "{null}"
+        )
+    }
+
+let topLevelRouter = router {
+    forward @"" webApp
+
+    forward "/logging" Controller.loggingRouter
+}
 
 let app =
     application {
-        url "http://0.0.0.0:8085"
-        use_router (webApp)
+        url "http://localhost:8085/" //"http://0.0.0.0:8085"
+        use_router (topLevelRouter)
         memory_cache
         use_static "public"
         use_gzip

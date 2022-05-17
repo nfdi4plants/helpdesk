@@ -12,6 +12,7 @@
     <Compile Include="Captcha\CaptchaStore.fs" />
     <Compile Include="Targets.fs" />
     <Compile Include="MSInterop.fs" />
+    <Compile Include="LoggerFunctions.fs" />
     <None Include="paket.references" />
     <Compile Include="Server.fs" />
   </ItemGroup>
