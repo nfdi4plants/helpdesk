@@ -7,12 +7,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Fonts\*.ttf" />
+    <Compile Include="Logging\LoggerFunctions.fs" />
+    <Compile Include="Logging\LoggingView.fs" />
     <Compile Include="Version.fs" />
     <Compile Include="Captcha\CaptchaCreate.fs" />
     <Compile Include="Captcha\CaptchaStore.fs" />
     <Compile Include="Targets.fs" />
     <Compile Include="MSInterop.fs" />
-    <Compile Include="LoggerFunctions.fs" />
     <None Include="paket.references" />
     <Compile Include="Server.fs" />
   </ItemGroup>
