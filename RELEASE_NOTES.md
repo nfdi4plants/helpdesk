@@ -1,6 +1,6 @@
-### 1.2.0+68259f1 (Released 2022-5-27)
+### 1.2.0+70f56b5 (Released 2022-5-27)
 * Additions:
-    * latest commit #68259f1
+    * latest commit #70f56b5
     * [[#c2e969c](https://github.com/Freymaurer/nfdi-helpdesk/commit/c2e969c80cef83dda97e5091eac37d5273afb0b5)] Add docker build/publish automatisation :construction_worker:
     * [[#a67dc4f](https://github.com/Freymaurer/nfdi-helpdesk/commit/a67dc4f226a8e99328f612ef65a6ac58753cf4fb)] Update README.md for docker publish :books:
     * [[#55ac6e1](https://github.com/Freymaurer/nfdi-helpdesk/commit/55ac6e1bfa2d12ba87db20fd2578e5d172a10669)] Add major categorie to specify "More" subcategories
