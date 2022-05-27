@@ -1,3 +1,12 @@
+### 1.2.0+68259f1 (Released 2022-5-27)
+* Additions:
+    * latest commit #68259f1
+    * [[#c2e969c](https://github.com/Freymaurer/nfdi-helpdesk/commit/c2e969c80cef83dda97e5091eac37d5273afb0b5)] Add docker build/publish automatisation :construction_worker:
+    * [[#a67dc4f](https://github.com/Freymaurer/nfdi-helpdesk/commit/a67dc4f226a8e99328f612ef65a6ac58753cf4fb)] Update README.md for docker publish :books:
+    * [[#55ac6e1](https://github.com/Freymaurer/nfdi-helpdesk/commit/55ac6e1bfa2d12ba87db20fd2578e5d172a10669)] Add major categorie to specify "More" subcategories
+    * [[#b97b59c](https://github.com/Freymaurer/nfdi-helpdesk/commit/b97b59c6f431a60ebdbbc37b889f2a14f3e842e9)] Change dev run target to only open browser with supplied "--open"
+    * [[#68259f1](https://github.com/Freymaurer/nfdi-helpdesk/commit/68259f1f911482fcebd30cfe0ec332c1b090146b)] Update nfdi4plants web-components :arrow_up:
+
 ### 1.1.0+61e8147 (Released 2022-2-23)
 * Additions:
     * latest commit #61e8147
