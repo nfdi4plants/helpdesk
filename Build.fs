@@ -29,9 +29,9 @@ module ReleaseNoteTasks =
     //)
 
     let updateReleaseNotes = Target.create "release" (fun config ->
-        Release.exists()
+        ReleaseNotes.ensure()
 
-        Release.update(ProjectInfo.gitOwner, ProjectInfo.gitName, config)
+        ReleaseNotes.update(ProjectInfo.gitOwner, ProjectInfo.gitName, config)
 
         let newRelease = ReleaseNotes.load "RELEASE_NOTES.md"
         
@@ -57,7 +57,7 @@ module Docker =
         let releaseNotesPath = "RELEASE_NOTES.md"
         let port = "8085"
 
-        Release.exists()
+        ReleaseNotes.ensure()
         let newRelease = ReleaseNotes.load releaseNotesPath
         let check = Fake.Core.UserInput.getUserInput($"Is version {newRelease.SemVer.Major}.{newRelease.SemVer.Minor}.{newRelease.SemVer.Patch} correct? (y/n/true/false)" )
 
