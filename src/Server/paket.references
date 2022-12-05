@@ -4,3 +4,4 @@ Microsoft.AspNetCore.Authentication.JwtBearer
 Microsoft.Graph
 SixLabors.ImageSharp.Drawing
 DynamicObj
+Azure.Identity

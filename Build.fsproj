@@ -9,12 +9,11 @@
     <Compile Include="Build.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="5.0.2" />
+    <PackageReference Include="FSharp.Core" Version="6.0.7" />
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
     <PackageReference Include="Fake.Core.Target" Version="5.20.4" />
     <PackageReference Include="Fake.IO.FileSystem" Version="5.20.4" />
       <PackageReference Include="Fake.Extensions.Release" Version="0.2.0" />
       <PackageReference Include="Fake.Core.UserInput" Version="5.20.4" />
   </ItemGroup>
-  <Import Project=".paket\Paket.Restore.targets" />
 </Project>

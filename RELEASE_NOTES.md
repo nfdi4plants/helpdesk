@@ -1,3 +1,9 @@
+### 1.3.0+94f7532 (Released 2022-12-5)
+* Additions:
+    * latest commit #94f7532
+* Bugfixes:
+    * [[#94f7532](https://github.com/Freymaurer/nfdi-helpdesk/commit/94f7532f4e0a118cc26fda61d21df8ee89cbc23d)] Work on fix commit [WIP]
+
 ### 1.2.0+70f56b5 (Released 2022-5-27)
 * Additions:
     * latest commit #70f56b5
