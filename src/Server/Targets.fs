@@ -21,11 +21,16 @@ module MSTeams =
     open IssueTypes
 
     let getMSModel (ctx:HttpContext) = 
+        let checkEmptyAuth (str:string) = if str.Trim() = "" then failwith "Missing authorization information. Please report this error to a maintainer."
         let settings = ctx.GetService<IConfiguration>()
         let clientID = settings.["clientId"]
         let tentantID = settings.["tenantId"]
         let serviceBotUsername = settings.["serviceBot-username"]
         let serviceBotPassword = settings.["serviceBot-pw"]
+        checkEmptyAuth clientID
+        checkEmptyAuth tentantID
+        checkEmptyAuth serviceBotUsername
+        checkEmptyAuth serviceBotPassword
         UsernamePasswordCredential(serviceBotUsername, serviceBotPassword, tentantID, clientID)
 
     // ids can be found like this: https://powerusers.microsoft.com/t5/image/serverpage/image-id/188342i9A8AD2E8360DAF76/image-dimensions/1700?v=v2&px=-1
