@@ -1,5 +1,7 @@
-### 1.3.0+aa782f7 (Released 2022-11-11)
+### 1.3.0+4520822 (Released 2022-12-16)
 * Additions:
+    * [[#4520822](https://github.com/Freymaurer/nfdi-helpdesk/commit/4520822a232d7ca45da32f8e085242ba58755bf4)] Finish merge
+    * [[#9eaeee8](https://github.com/Freymaurer/nfdi-helpdesk/commit/9eaeee81283bd82b5f3f8ea134e417ea505f656e)] Update dependencies :arrow_up:
     * [[#733af9d](https://github.com/Freymaurer/nfdi-helpdesk/commit/733af9d227734d4762f97517d5375de9be450aad)] Update dependencies :arrow_up:
     * [[#45f7c0e](https://github.com/Freymaurer/nfdi-helpdesk/commit/45f7c0ec878b4ab9139f0d6361e69174d6800f19)] Update docker environment :whale:
     * [[#aa782f7](https://github.com/Freymaurer/nfdi-helpdesk/commit/aa782f749a101bd70bfb97862c5d90de8601b45e)] Add more detailed error msg if credentials file is missing
