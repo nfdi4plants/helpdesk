@@ -2,7 +2,7 @@
 * Additions:
     * [[#a7b2ae3](https://github.com/Freymaurer/nfdi-helpdesk/commit/a7b2ae3766c683da7801931281be8a77da00ba47)] Update Dependencies :arrow_up:
 
-### 1.3.0+4520822 (Released 2022-12-16)
+### 1.3.0+4520822 (Released 2022-11-11)
 * Additions:
     * [[#4520822](https://github.com/Freymaurer/nfdi-helpdesk/commit/4520822a232d7ca45da32f8e085242ba58755bf4)] Finish merge
     * [[#9eaeee8](https://github.com/Freymaurer/nfdi-helpdesk/commit/9eaeee81283bd82b5f3f8ea134e417ea505f656e)] Update dependencies :arrow_up:
