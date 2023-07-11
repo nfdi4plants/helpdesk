@@ -1,10 +1,6 @@
 module Title
 
-open Fable.React
-open Elmish
-open Fable.Remoting.Client
 open State
-open Shared
 open IssueTypes
 open Feliz
 open Feliz.Bulma
@@ -15,6 +11,7 @@ let private topicList = [
     IssueGeneralTopic.Metadata
     IssueGeneralTopic.Tools
     IssueGeneralTopic.Workflows
+    IssueGeneralTopic.Documentation
     IssueGeneralTopic.Other
 ]
 
@@ -74,7 +71,8 @@ module ButtonDropdown =
                        | Topic.Metadata m -> m.toString
                        | Topic.Tools t -> t.toString
                        | Topic.Workflows w -> w.toString
-                       /// This could happen when somehow Topic.Other gets this element created
+                       | Topic.Documentation d -> d.toString
+                       // This could happen when somehow Topic.Other gets this element created
                        | other -> failwith $"Could not match {other} with issue subcategories."
                     yield
                         Html.div [
@@ -114,8 +112,8 @@ module ButtonDropdown =
             prop.onClick(fun e ->
                 // prevent main element "dropdown toggle"
                 e.stopPropagation(); e.preventDefault()
-                /// This codeblock can be used to allow "onClick" add of the more topic.
-                /// I deemed it unintuitive and to increase maintainablity issues.
+                // This codeblock can be used to allow "onClick" add of the more topic.
+                // I deemed it unintuitive and to increase maintainablity issues.
                 //if e.view.innerWidth < SwitchDropdownResponsivePX then
                 //     Msg.UpdateDropdownActiveTopic (Some block) |> dispatch
                 //else
@@ -142,7 +140,7 @@ module ButtonDropdown =
                             prop.style [style.marginRight(length.rem 1.5)]
                             prop.text block.toString
                         ]
-                        /// 'Other' has no subcategory
+                        // 'Other' has no subcategory
                         if block <> IssueGeneralTopic.Other then
                             Html.i [
                                 prop.style [
@@ -188,7 +186,8 @@ module ButtonDropdown =
                     | Topic.Metadata m -> m.toString
                     | Topic.Tools t -> t.toString
                     | Topic.Workflows w -> w.toString
-                    /// This could happen when somehow Topic.Other gets this element created
+                    | Topic.Documentation d -> d.toString
+                    // This could happen when somehow Topic.Other gets this element created
                     | other -> failwith $"Could not match {other} with issue subcategories."
                 Html.span [
                     prop.text subCText
@@ -374,7 +373,7 @@ let issueTitleElement model dispatch =
             Bulma.field.div [
                 field.hasAddons
                 prop.children [
-                    /// This is the dropdown button menu
+                    // This is the dropdown button menu
                     ButtonDropdown.createDropdown model dispatch
                     Bulma.control.p [
                         control.isExpanded
@@ -382,10 +381,10 @@ let issueTitleElement model dispatch =
                             Bulma.input.text [
                                 prop.id InputIds.TitleInput
                                 prop.placeholder "please give your issue a title .."
-                                prop.onChange(fun (e:Browser.Types.Event) ->
+                                prop.onChange(fun (e:string) ->
                                     let nextFormModel = {
                                         model.FormModel with
-                                            IssueTitle = e.Value
+                                            IssueTitle = e
                                     }
                                     UpdateFormModel nextFormModel |> dispatch
                                 )

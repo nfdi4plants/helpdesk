@@ -17,7 +17,7 @@ open Feliz.Bulma
 //        )
 //    ])
 
-let bodyComp = React.functionComponent (fun () ->
+let bodyComp = Feliz.React.functionComponent (fun () ->
     Html.div [
         prop.className "modal-card-body"
         

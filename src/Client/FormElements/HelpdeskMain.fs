@@ -1,6 +1,5 @@
 module HelpdeskMain
 
-open Fable.React
 open Elmish
 open Fable.Remoting.Client
 open State

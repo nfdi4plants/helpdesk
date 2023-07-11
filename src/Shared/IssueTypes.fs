@@ -45,7 +45,7 @@ module IssueSubtopics =
 
     type Infrastructure =
     | RegistrationLogin
-    | GitLab
+    | DataHUB
     | MetadataRegistry
     | Invenio
     | InfrastructureCode
@@ -54,17 +54,17 @@ module IssueSubtopics =
     with
         member this.toString =
             match this with
-            | RegistrationLogin    -> "Registration Login"
-            | GitLab               -> "GitLab"
-            | MetadataRegistry     -> "Metadata Registry"
-            | Invenio              -> "Invenio"
-            | InfrastructureCode   -> "Infrastructure Code"
-            | More                 -> "More"
+            | RegistrationLogin     -> "Registration Login"
+            | DataHUB               -> "DataHUB"
+            | MetadataRegistry      -> "Metadata Registry"
+            | Invenio               -> "Invenio"
+            | InfrastructureCode    -> "Infrastructure Code"
+            | More                  -> "More"
 
         static member ofString(str) =
             match str with
             | "Registration Login"  | "RegistrationLogin"    -> RegistrationLogin 
-            | "GitLab" -> GitLab            
+            | "GitLab" | "DataHUB" -> DataHUB            
             | "Metadata Registry"   | "MetadataRegistry"     -> MetadataRegistry  
             | "Invenio" -> Invenio           
             | "Infrastructure Code" | "InfrastructureCode"   -> InfrastructureCode
@@ -73,8 +73,9 @@ module IssueSubtopics =
 
     type Tools =
     | ARCCommander
+    | ARCitect
     | Swate
-    | DMPGenerator
+    | DataPLAN
     | Swobup
     | Converters
     | More
@@ -83,20 +84,22 @@ module IssueSubtopics =
         member this.toString =
             match this with
             | ARCCommander  -> "ARC Commander"
+            | ARCitect      -> "ARCitect"
             | Swate         -> "Swate"
-            | DMPGenerator  -> "DMP Generator"
+            | DataPLAN      -> "DataPLAN"
             | Swobup        -> "Swobup"
             | Converters    -> "Converters"
             | More          -> "More"
 
         static member ofString(str) =
             match str with
-            | "ARC Commander" -> ARCCommander 
-            | "Swate"         -> Swate        
-            | "DMP Generator" -> DMPGenerator 
-            | "Swobup"        -> Swobup       
-            | "Converters"    -> Converters   
-            | "More"          -> More
+            | "ARC Commander"   -> ARCCommander
+            | "ARCitect"        -> ARCitect
+            | "Swate"           -> Swate        
+            | "DMP Generator" | "DataPLAN" -> DataPLAN 
+            | "Swobup"          -> Swobup       
+            | "Converters"      -> Converters   
+            | "More"            -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Tools subtopic"
 
     type Workflows =
@@ -137,6 +140,22 @@ module IssueSubtopics =
             | "More" -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Metadata subtopic"
 
+    type Documentation =
+    | KnowledgeBase
+    | More
+
+    with
+        member this.toString =
+            match this with
+            | KnowledgeBase    -> "Knowledge Base"
+            | More     -> "More"
+
+        static member ofString(str) =
+            match str with
+            | "Knowledge Base" | "KnowledgeBase" ->  KnowledgeBase 
+            | "More" -> More
+            | anythingElse -> failwith $"Could not parse {anythingElse} to Metadata subtopic"
+
 /// This should be the main type for working with issue categories
 type Topic =
 /// Research Data Management
@@ -145,6 +164,7 @@ type Topic =
 | Tools of IssueSubtopics.Tools
 | Workflows of IssueSubtopics.Workflows
 | Metadata of IssueSubtopics.Metadata
+| Documentation of IssueSubtopics.Documentation
 | Other
 
     member this.toSubCategoryString =
@@ -154,6 +174,7 @@ type Topic =
         | Tools t -> t.toString
         | Workflows w -> w.toString
         | Metadata m -> m.toString
+        | Documentation d -> d.toString
         | Other -> IssueGeneralTopic.Other.toString
 
     member this.toCategoryString =
@@ -163,6 +184,7 @@ type Topic =
         | Tools _           -> IssueGeneralTopic.Tools.toString
         | Workflows _       -> IssueGeneralTopic.Workflows.toString
         | Metadata _        -> IssueGeneralTopic.Metadata.toString
+        | Documentation _    -> IssueGeneralTopic.Documentation.toString
         | Other             -> IssueGeneralTopic.Other.toString
 
     member this.toUrlString =
@@ -172,7 +194,8 @@ type Topic =
         | Infrastructure i  -> $"{rmWhitespace IssueGeneralTopic.Infrastructure.toString}_{rmWhitespace i.toString}" 
         | Tools t           -> $"{rmWhitespace IssueGeneralTopic.Tools.toString}_{rmWhitespace t.toString}" 
         | Workflows w       -> $"{rmWhitespace IssueGeneralTopic.Workflows.toString}_{rmWhitespace w.toString}" 
-        | Metadata m        -> $"{rmWhitespace IssueGeneralTopic.Metadata.toString}_{rmWhitespace m.toString}" 
+        | Metadata m        -> $"{rmWhitespace IssueGeneralTopic.Metadata.toString}_{rmWhitespace m.toString}"
+        | Documentation d   -> $"{rmWhitespace IssueGeneralTopic.Documentation.toString}_{rmWhitespace d.toString}"
         | Other             -> rmWhitespace IssueGeneralTopic.Other.toString
 
     static member ofUrlString(str:string) =
@@ -195,6 +218,9 @@ type Topic =
         | IssueGeneralTopic.Metadata       ->
             let subtopic = IssueSubtopics.Metadata.ofString subtopic
             Topic.Metadata subtopic
+        | IssueGeneralTopic.Documentation   ->
+            let subtopic = IssueSubtopics.Documentation.ofString subtopic
+            Topic.Documentation subtopic
         | IssueGeneralTopic.Other          ->
             Topic.Other
 
@@ -207,6 +233,7 @@ type IssueGeneralTopic =
 | Tools
 | Workflows
 | Metadata
+| Documentation
 | Other
 
 with
@@ -217,6 +244,7 @@ with
         | "Tools"                               -> Tools
         | "Workflows"                           -> Workflows
         | "Metadata"                            -> Metadata
+        | "Documentation"                       -> Documentation
         | "Other"                               -> Other
         | anythingElse -> failwith $"Unable to parse '{anythingElse}' to IssueCategory."
 
@@ -227,6 +255,7 @@ with
         | Tools             -> "Tools"
         | Workflows         -> "Workflows"
         | Metadata          -> "Metadata"
+        | Documentation     -> "Documentation"
         | Other             -> "Other"
 
     member this.subcategories =
@@ -242,7 +271,7 @@ with
             |]
         | Infrastructure ->
             [|
-                Topic.Infrastructure IssueSubtopics.Infrastructure.GitLab
+                Topic.Infrastructure IssueSubtopics.Infrastructure.DataHUB
                 Topic.Infrastructure IssueSubtopics.Infrastructure.InfrastructureCode
                 Topic.Infrastructure IssueSubtopics.Infrastructure.Invenio
                 Topic.Infrastructure IssueSubtopics.Infrastructure.MetadataRegistry
@@ -253,7 +282,7 @@ with
             [|
                 Topic.Tools IssueSubtopics.Tools.ARCCommander
                 Topic.Tools IssueSubtopics.Tools.Converters
-                Topic.Tools IssueSubtopics.Tools.DMPGenerator
+                Topic.Tools IssueSubtopics.Tools.DataPLAN
                 Topic.Tools IssueSubtopics.Tools.Swate
                 Topic.Tools IssueSubtopics.Tools.Swobup
                 Topic.Tools IssueSubtopics.Tools.More
@@ -269,6 +298,11 @@ with
                 Topic.Metadata IssueSubtopics.Metadata.SwateTemplate
                 Topic.Metadata IssueSubtopics.Metadata.OntologyUpdate
                 Topic.Metadata IssueSubtopics.Metadata.More
+            |]
+        | Documentation ->
+            [|
+                Topic.Documentation IssueSubtopics.Documentation.KnowledgeBase
+                Topic.Documentation IssueSubtopics.Documentation.More
             |]
         | Other ->
             [||]
