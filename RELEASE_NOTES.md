@@ -1,3 +1,9 @@
+### 1.3.2+ab57292 (Released 2023-7-11)
+* Additions:
+    * [[#ab57292](https://github.com/Freymaurer/nfdi-helpdesk/commit/ab57292df362077cca415cd2048268cfbddea61a)] Resolve latest issues #11#12#13
+* Bugfixes:
+    * [[#66011da](https://github.com/Freymaurer/nfdi-helpdesk/commit/66011da89746cecff17f265d883668ca9d862a28)] fix typo
+
 ### 1.3.1+a7b2ae3 (Released 2022-12-16)
 * Additions:
     * [[#a7b2ae3](https://github.com/Freymaurer/nfdi-helpdesk/commit/a7b2ae3766c683da7801931281be8a77da00ba47)] Update Dependencies :arrow_up:
