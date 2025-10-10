@@ -6,6 +6,41 @@ This project is a helpdesk implementation based on the SAFE stack framework for 
 - dotnet native and fully customizable image captcha logic.
 - Writing input to Microsoft Teams planner tasks.
 
+# Procedure
+
+```mermaid
+---
+title: DataPLANT Helpdesk
+config:
+    sequence:
+        showSequenceNumbers: true
+---
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant Backend
+    participant MSTeams
+    Note over Frontend,Backend: SAFE stack
+    User ->> Frontend: Fill Form
+    User ->> Frontend: Write Captcha
+    Frontend ->> Backend: Verify Captcha
+    Backend ->> Frontend: Confirm Captcha
+    User ->> Frontend: Submit
+    Frontend ->> Backend: Submit
+    Backend->>MSTeams: Send to task planner
+    create actor DataStewards 
+    MSTeams ->> DataStewards : Notify
+    DataStewards --) DataStewards: Distribute to correct member
+    Backend ->> Frontend: Confirm successful submit
+    Frontend ->> User: Confirm successful submit
+    link Frontend: Page @ https://helpdesk.nfdi4plants.org/
+    link Frontend: React @ https://reactnative.dev/
+    link Frontend: ProgrammingLanguage (F#, Fable) @ https://fable.io/
+    link Backend: aspnetcore @ https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core?view=aspnetcore-8.0
+    link Backend: ProgrammingLanguage (F#) @ https://safe-stack.github.io/
+
+```
+
 ## Dev
 
 ### Run in development
