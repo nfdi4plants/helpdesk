@@ -31,7 +31,7 @@ let clearInputs() =
     email?value <- ""
     let captcha = inptuById(InputIds.CaptchaInput)
     captcha?value <- ""
-    
+
 
 let init(url: Routing.Route option) : Model * Cmd<Msg> =
     let model = {
@@ -154,7 +154,7 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     | GenericError (nextCmd,exn) ->
         Alerts.genericErrorAlert(exn)
         model, nextCmd
-        
+
 
 open Feliz
 open Feliz.Bulma
@@ -168,7 +168,30 @@ let view (model: Model) (dispatch: Msg -> unit) =
         prop.children [
             Modal.loadingModal model dispatch
             Bulma.heroHead [
-                nfdi_webcomponents.nfdiNavbar [] []
+                // nfdi_webcomponents.nfdiNavbar [] []
+                Html.div [
+                    prop.style [
+                        style.padding (length.px 8, length.px 16);
+                        style.width (length.percent 100);
+                        style.height (length.px 48);
+                        style.backgroundColor NFDIColors.DarkBlue.Base;
+                        style.position.fixedRelativeToWindow;
+                        style.top 0
+                        style.zIndex 10
+                    ]
+                    prop.children [
+                        Html.a [
+                            prop.href "https://www.nfdi4plants.org/"
+                            prop.children [
+                                Html.img [
+                                    prop.src "/DataPLANT_logo_minimal_rounded_bg_transparent.svg"
+                                    prop.height 32
+                                    prop.width 32
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ]
             Bulma.heroBody [
                 prop.classes ["decrease-padding"]
@@ -188,6 +211,6 @@ let view (model: Model) (dispatch: Msg -> unit) =
                     ]
                 ]
             ]
-            nfdi_webcomponents.nfdiFooter [] []
+            // nfdi_webcomponents.nfdiFooter [] []
         ]
     ]

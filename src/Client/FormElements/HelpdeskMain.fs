@@ -26,7 +26,7 @@ let header =
                                 Bulma.image [
                                     Bulma.image.is128x128
                                     prop.style [style.marginLeft 0; style.marginRight 0]
-                                    prop.children[
+                                    prop.children [
                                         Html.img [
                                             prop.src "https://raw.githubusercontent.com/nfdi4plants/Branding/master/logos/DataPLANT/DataPLANT_logo_square_bg_darkblue.svg"
                                         ]

@@ -13,7 +13,6 @@
         <Compile Include="State.fs" />
         <Compile Include="Modal.fs" />
         <Compile Include="alerts.fs" />
-        <Compile Include="nfdi-webcomponents.fs" />
         <Compile Include="FormElements\HelpdeskCheckradio.fs" />
         <Compile Include="FormElements\HelpdeskTitle.fs" />
         <Compile Include="FormElements\HelpdeskDescription.fs" />
