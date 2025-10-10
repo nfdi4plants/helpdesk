@@ -6,11 +6,11 @@ type IssueType =
 | Question
 | Bug
 | Request
-    static member ofString(str) =
-        match str with
-        | "Question"    -> IssueType.Question
-        | "Bug"         -> IssueType.Bug
-        | "Request"     -> IssueType.Request
+    static member ofString(str: string) =
+        match str.ToLower() with
+        | "question"    -> IssueType.Question
+        | "bug"         -> IssueType.Bug
+        | "request"     -> IssueType.Request
         | anythingElse  -> failwith $"Unable to parse '{anythingElse}' to IssueType."
 
 module IssueSubtopics =
@@ -33,14 +33,14 @@ module IssueSubtopics =
             | AnnotationPrinciples  -> "Annotation Principles"
             | More                  -> "More"
 
-        static member ofString(str) =
-            match str with
-            | "Data Security" | "DataSecurity"                  -> DataSecurity
-            | "Data Literacy" | "DataLiteracy"                  -> DataLiteracy
-            | "Teaching"                                        -> Teaching
-            | "ARC Structure" | "ARCStructure"                  -> ARCStructure
-            | "Annotation Principles"| "AnnotationPrinciples"   -> AnnotationPrinciples
-            | "More" | "More"                                   -> More
+        static member ofString(str: string) =
+            match str.ToLower() with
+            | "data security" | "datasecurity"                  -> DataSecurity
+            | "data literacy" | "dataliteracy"                  -> DataLiteracy
+            | "teaching"                                        -> Teaching
+            | "arc structure" | "arcstructure"                  -> ARCStructure
+            | "annotation principles"| "annotationprinciples"   -> AnnotationPrinciples
+            | "more"                                            -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to RDM subtopic"
 
     type Infrastructure =
@@ -61,14 +61,14 @@ module IssueSubtopics =
             | InfrastructureCode    -> "Infrastructure Code"
             | More                  -> "More"
 
-        static member ofString(str) =
-            match str with
-            | "Registration Login"  | "RegistrationLogin"    -> RegistrationLogin
-            | "GitLab" | "DataHUB" -> DataHUB
-            | "Metadata Registry"   | "MetadataRegistry"     -> MetadataRegistry
-            | "Invenio" -> Invenio
-            | "Infrastructure Code" | "InfrastructureCode"   -> InfrastructureCode
-            | "More" -> More
+        static member ofString(str: string) =
+            match str.ToLower() with
+            | "registration login"  | "registrationlogin"    -> RegistrationLogin
+            | "gitlab" | "datahub" -> DataHUB
+            | "metadata registry"   | "metadataregistry"     -> MetadataRegistry
+            | "invenio" -> Invenio
+            | "infrastructure code" | "infrastructurecode"   -> InfrastructureCode
+            | "more" -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Infrastructure subtopic"
 
     type Tools =
@@ -93,16 +93,16 @@ module IssueSubtopics =
             | Converters    -> "Converters"
             | More          -> "More"
 
-        static member ofString(str) =
-            match str with
-            | "ARC Commander" | "ARCCommander"   -> ARCCommander
-            | "ARCitect"        -> ARCitect
-            | "Swate"           -> Swate
-            | "DataHUB" | "GitLab" -> DataHUB
-            | "DMP Generator" | "DMPGenerator" | "DataPLAN" -> DataPLAN
-            | "Swobup"          -> Swobup
-            | "Converters"      -> Converters
-            | "More"            -> More
+        static member ofString(str: string) =
+            match str.ToLower() with
+            | "arc commander" | "arccommander"   -> ARCCommander
+            | "arcitect"        -> ARCitect
+            | "swate"           -> Swate
+            | "datahub" | "gitlab" -> DataHUB
+            | "dmp generator" | "dmpgenerator" | "dataplan" -> DataPLAN
+            | "swobup"          -> Swobup
+            | "converters"      -> Converters
+            | "more"            -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Tools subtopic"
 
     type Workflows =
@@ -117,11 +117,11 @@ module IssueSubtopics =
             | Galaxy    -> "Galaxy"
             | More      -> "More"
 
-        static member ofString(str) =
-            match str with
-            | "CWL"    -> CWL
-            | "Galaxy" -> Galaxy
-            | "More"   -> More
+        static member ofString(str: string) =
+            match str.ToLower() with
+            | "cwl"    -> CWL
+            | "galaxy" -> Galaxy
+            | "more"   -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Workflows subtopic"
 
     type Metadata =
@@ -136,11 +136,11 @@ module IssueSubtopics =
             | SwateTemplate     -> "Swate Template"
             | More              -> "More"
 
-        static member ofString(str) =
-            match str with
-            | "Ontology Update" | "OntologyUpdate" ->  OntologyUpdate
-            | "Swate Template" | "SwateTemplate" ->  SwateTemplate
-            | "More" -> More
+        static member ofString(str: string) =
+            match str.ToLower() with
+            | "ontology update" | "ontologyupdate" ->  OntologyUpdate
+            | "swate template" | "swatetemplate" ->  SwateTemplate
+            | "more" -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Metadata subtopic"
 
     type Documentation =
@@ -153,10 +153,10 @@ module IssueSubtopics =
             | KnowledgeBase    -> "Knowledge Base"
             | More     -> "More"
 
-        static member ofString(str) =
-            match str with
-            | "Knowledge Base" | "KnowledgeBase" ->  KnowledgeBase
-            | "More" -> More
+        static member ofString(str: string) =
+            match str.ToLower() with
+            | "knowledge base" | "knowledgebase" ->  KnowledgeBase
+            | "more" -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Metadata subtopic"
 
 /// This should be the main type for working with issue categories
@@ -241,23 +241,23 @@ type IssueGeneralTopic =
 
 with
     static member ofString (str:string) =
-        match str with
-        | "RDM" | "Research Data Management" | "ResearchDataManagement" -> RDM
-        | "Infrastructure"                      -> Infrastructure
-        | "Tools"                               -> Tools
-        | "Workflows"                           -> Workflows
-        | "Metadata"                            -> Metadata
-        | "Documentation"                       -> Documentation
-        | "Other"                               -> Other
+        match str.ToLower() with
+        | "rdm" | "research data management" | "researchdatamanagement" -> RDM
+        | "infrastructure"                      -> Infrastructure
+        | "tools" | "tools and services" | "toolsandservices" -> Tools
+        | "workflows"                           -> Workflows
+        | "metadata" | "metadata and ontologies" | "metadataandontologies" -> Metadata
+        | "documentation"                       -> Documentation
+        | "other"                               -> Other
         | anythingElse -> failwith $"Unable to parse '{anythingElse}' to IssueCategory."
 
     member this.toString =
         match this with
         | RDM               -> "Research Data Management"
         | Infrastructure    -> "Infrastructure"
-        | Tools             -> "Tools"
+        | Tools             -> "Tools and Services"
         | Workflows         -> "Workflows"
-        | Metadata          -> "Metadata"
+        | Metadata          -> "Metadata and Ontologies"
         | Documentation     -> "Documentation"
         | Other             -> "Other"
 
