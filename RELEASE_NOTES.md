@@ -1,14 +1,29 @@
-### 1.3.2+ab57292 (Released 2023-7-11)
+## 1.3.3 (Released 2023-7-11)
+
+### Changed
+
+* Navbar to minimal version
+* RELEASE_NOTES.md structure to keep a changelog
+
+### Deprecated
+
+* Remove nfdi4plants/web-components
+
+### Removed
+
+* Footer component
+
+## 1.3.2+ab57292 (Released 2023-7-11)
 * Additions:
     * [[#ab57292](https://github.com/Freymaurer/nfdi-helpdesk/commit/ab57292df362077cca415cd2048268cfbddea61a)] Resolve latest issues #11#12#13
 * Bugfixes:
     * [[#66011da](https://github.com/Freymaurer/nfdi-helpdesk/commit/66011da89746cecff17f265d883668ca9d862a28)] fix typo
 
-### 1.3.1+a7b2ae3 (Released 2022-12-16)
+## 1.3.1+a7b2ae3 (Released 2022-12-16)
 * Additions:
     * [[#a7b2ae3](https://github.com/Freymaurer/nfdi-helpdesk/commit/a7b2ae3766c683da7801931281be8a77da00ba47)] Update Dependencies :arrow_up:
 
-### 1.3.0+4520822 (Released 2022-11-11)
+## 1.3.0+4520822 (Released 2022-11-11)
 * Additions:
     * [[#4520822](https://github.com/Freymaurer/nfdi-helpdesk/commit/4520822a232d7ca45da32f8e085242ba58755bf4)] Finish merge
     * [[#9eaeee8](https://github.com/Freymaurer/nfdi-helpdesk/commit/9eaeee81283bd82b5f3f8ea134e417ea505f656e)] Update dependencies :arrow_up:
@@ -16,7 +31,7 @@
     * [[#45f7c0e](https://github.com/Freymaurer/nfdi-helpdesk/commit/45f7c0ec878b4ab9139f0d6361e69174d6800f19)] Update docker environment :whale:
     * [[#aa782f7](https://github.com/Freymaurer/nfdi-helpdesk/commit/aa782f749a101bd70bfb97862c5d90de8601b45e)] Add more detailed error msg if credentials file is missing
 
-### 1.2.0+70f56b5 (Released 2022-5-27)
+## 1.2.0+70f56b5 (Released 2022-5-27)
 * Additions:
     * latest commit #70f56b5
     * [[#c2e969c](https://github.com/Freymaurer/nfdi-helpdesk/commit/c2e969c80cef83dda97e5091eac37d5273afb0b5)] Add docker build/publish automatisation :construction_worker:
@@ -25,7 +40,7 @@
     * [[#b97b59c](https://github.com/Freymaurer/nfdi-helpdesk/commit/b97b59c6f431a60ebdbbc37b889f2a14f3e842e9)] Change dev run target to only open browser with supplied "--open"
     * [[#68259f1](https://github.com/Freymaurer/nfdi-helpdesk/commit/68259f1f911482fcebd30cfe0ec332c1b090146b)] Update nfdi4plants web-components :arrow_up:
 
-### 1.1.0+61e8147 (Released 2022-2-23)
+## 1.1.0+61e8147 (Released 2022-2-23)
 * Additions:
     * latest commit #61e8147
     * [[#7d59712](https://github.com/Freymaurer/nfdi-helpdesk/commit/7d5971235c89ed8d6c8e1999cb45d49cdc256bdb)] Add info for localtunnel :books:
@@ -33,7 +48,7 @@
     * [[#c45deab](https://github.com/Freymaurer/nfdi-helpdesk/commit/c45deabec23a2707da259e4fca3ce74f0a6fbe35)] Fix old link in nfdi4plants navbar :arrow_up:
     * [[#37c7724](https://github.com/Freymaurer/nfdi-helpdesk/commit/37c772482c7914f1905010406755268ec91bb959)] Fix mobile device onTouch bug (Issue #8). :bug:
 
-### 1.0.0+11a70d2 (Released 2022-2-21)
+## 1.0.0+11a70d2 (Released 2022-2-21)
 * Additions:
     * latest commit #11a70d2
     * [[#11a70d2](https://github.com/Freymaurer/nfdi-helpdesk/commit/11a70d245d15c3ace5a53e3050a46ba36a2383bd)] Update README.md with dev info
@@ -65,14 +80,14 @@
     * [[#48b0247](https://github.com/Freymaurer/nfdi-helpdesk/commit/48b0247c019b9ea0003d0a41000f53469354ecbc)] fix dropdown touch issues
     * [[#f0414cc](https://github.com/Freymaurer/nfdi-helpdesk/commit/f0414cce8dc8572efd0ac7d4ea99004d79909313)] Fix random generator list picking (Issue #7). :bug:
 
-### 0.0.0+005de3e (Released 2022-2-4)
+## 0.0.0+005de3e (Released 2022-2-4)
 * Additions:
     * latest commit #005de3e
     * [[#005de3e](https://github.com/Freymaurer/nfdi-helpdesk/commit/005de3eef9f01e94a37eb32b40441dc365568059)] Init SAFE :tada:
     * [[#6319b43](https://github.com/Freymaurer/nfdi-helpdesk/commit/6319b4397eb247e37beccfa77e44ca5fb7e9b8ad)] Initial commit
     * Initial set up for RELEASE_Notes.md
 
-### 0.0.0 (Released 2022-2-4)
+## 0.0.0 (Released 2022-2-4)
 * Additions:
     * Initial set up for RELEASE_Notes.md
 

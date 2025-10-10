@@ -35,10 +35,10 @@ module IssueSubtopics =
 
         static member ofString(str) =
             match str with
-            | "Data Security" | "DataSecurity"                  -> DataSecurity        
-            | "Data Literacy" | "DataLiteracy"                  -> DataLiteracy        
-            | "Teaching"                                        -> Teaching            
-            | "ARC Structure" | "ARCStructure"                  -> ARCStructure        
+            | "Data Security" | "DataSecurity"                  -> DataSecurity
+            | "Data Literacy" | "DataLiteracy"                  -> DataLiteracy
+            | "Teaching"                                        -> Teaching
+            | "ARC Structure" | "ARCStructure"                  -> ARCStructure
             | "Annotation Principles"| "AnnotationPrinciples"   -> AnnotationPrinciples
             | "More" | "More"                                   -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to RDM subtopic"
@@ -63,10 +63,10 @@ module IssueSubtopics =
 
         static member ofString(str) =
             match str with
-            | "Registration Login"  | "RegistrationLogin"    -> RegistrationLogin 
-            | "GitLab" | "DataHUB" -> DataHUB            
-            | "Metadata Registry"   | "MetadataRegistry"     -> MetadataRegistry  
-            | "Invenio" -> Invenio           
+            | "Registration Login"  | "RegistrationLogin"    -> RegistrationLogin
+            | "GitLab" | "DataHUB" -> DataHUB
+            | "Metadata Registry"   | "MetadataRegistry"     -> MetadataRegistry
+            | "Invenio" -> Invenio
             | "Infrastructure Code" | "InfrastructureCode"   -> InfrastructureCode
             | "More" -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Infrastructure subtopic"
@@ -74,6 +74,7 @@ module IssueSubtopics =
     type Tools =
     | ARCCommander
     | ARCitect
+    | DataHUB
     | Swate
     | DataPLAN
     | Swobup
@@ -86,6 +87,7 @@ module IssueSubtopics =
             | ARCCommander  -> "ARC Commander"
             | ARCitect      -> "ARCitect"
             | Swate         -> "Swate"
+            | DataHUB      -> "DataHUB"
             | DataPLAN      -> "DataPLAN"
             | Swobup        -> "Swobup"
             | Converters    -> "Converters"
@@ -93,12 +95,13 @@ module IssueSubtopics =
 
         static member ofString(str) =
             match str with
-            | "ARC Commander"   -> ARCCommander
+            | "ARC Commander" | "ARCCommander"   -> ARCCommander
             | "ARCitect"        -> ARCitect
-            | "Swate"           -> Swate        
-            | "DMP Generator" | "DataPLAN" -> DataPLAN 
-            | "Swobup"          -> Swobup       
-            | "Converters"      -> Converters   
+            | "Swate"           -> Swate
+            | "DataHUB" | "GitLab" -> DataHUB
+            | "DMP Generator" | "DMPGenerator" | "DataPLAN" -> DataPLAN
+            | "Swobup"          -> Swobup
+            | "Converters"      -> Converters
             | "More"            -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Tools subtopic"
 
@@ -116,7 +119,7 @@ module IssueSubtopics =
 
         static member ofString(str) =
             match str with
-            | "CWL"    -> CWL   
+            | "CWL"    -> CWL
             | "Galaxy" -> Galaxy
             | "More"   -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Workflows subtopic"
@@ -135,8 +138,8 @@ module IssueSubtopics =
 
         static member ofString(str) =
             match str with
-            | "Ontology Update" | "OntologyUpdate" ->  OntologyUpdate 
-            | "Swate Template" | "SwateTemplate" ->  SwateTemplate  
+            | "Ontology Update" | "OntologyUpdate" ->  OntologyUpdate
+            | "Swate Template" | "SwateTemplate" ->  SwateTemplate
             | "More" -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Metadata subtopic"
 
@@ -152,7 +155,7 @@ module IssueSubtopics =
 
         static member ofString(str) =
             match str with
-            | "Knowledge Base" | "KnowledgeBase" ->  KnowledgeBase 
+            | "Knowledge Base" | "KnowledgeBase" ->  KnowledgeBase
             | "More" -> More
             | anythingElse -> failwith $"Could not parse {anythingElse} to Metadata subtopic"
 
@@ -190,10 +193,10 @@ type Topic =
     member this.toUrlString =
         let rmWhitespace(str:string) = str.Replace(" ","")
         match this with
-        | RDM rdm           -> $"{rmWhitespace IssueGeneralTopic.RDM.toString}_{rmWhitespace rdm.toString}" 
-        | Infrastructure i  -> $"{rmWhitespace IssueGeneralTopic.Infrastructure.toString}_{rmWhitespace i.toString}" 
-        | Tools t           -> $"{rmWhitespace IssueGeneralTopic.Tools.toString}_{rmWhitespace t.toString}" 
-        | Workflows w       -> $"{rmWhitespace IssueGeneralTopic.Workflows.toString}_{rmWhitespace w.toString}" 
+        | RDM rdm           -> $"{rmWhitespace IssueGeneralTopic.RDM.toString}_{rmWhitespace rdm.toString}"
+        | Infrastructure i  -> $"{rmWhitespace IssueGeneralTopic.Infrastructure.toString}_{rmWhitespace i.toString}"
+        | Tools t           -> $"{rmWhitespace IssueGeneralTopic.Tools.toString}_{rmWhitespace t.toString}"
+        | Workflows w       -> $"{rmWhitespace IssueGeneralTopic.Workflows.toString}_{rmWhitespace w.toString}"
         | Metadata m        -> $"{rmWhitespace IssueGeneralTopic.Metadata.toString}_{rmWhitespace m.toString}"
         | Documentation d   -> $"{rmWhitespace IssueGeneralTopic.Documentation.toString}_{rmWhitespace d.toString}"
         | Other             -> rmWhitespace IssueGeneralTopic.Other.toString
@@ -201,7 +204,7 @@ type Topic =
     static member ofUrlString(str:string) =
         let majorTopic, subtopic =
             let ind = str.IndexOf("_")
-            str.[..ind-1],str.[ind+1..]
+            str.[..ind-1], str.[ind+1..]
         match IssueGeneralTopic.ofString majorTopic with
         | IssueGeneralTopic.RDM            ->
             let subtopic = IssueSubtopics.RDM.ofString subtopic
@@ -229,7 +232,7 @@ type Topic =
 type IssueGeneralTopic =
 /// Research Data Management
 | RDM
-| Infrastructure   
+| Infrastructure
 | Tools
 | Workflows
 | Metadata
@@ -281,7 +284,9 @@ with
         | Tools ->
             [|
                 Topic.Tools IssueSubtopics.Tools.ARCCommander
+                Topic.Tools IssueSubtopics.Tools.ARCitect
                 Topic.Tools IssueSubtopics.Tools.Converters
+                Topic.Tools IssueSubtopics.Tools.DataHUB
                 Topic.Tools IssueSubtopics.Tools.DataPLAN
                 Topic.Tools IssueSubtopics.Tools.Swate
                 Topic.Tools IssueSubtopics.Tools.Swobup
@@ -309,9 +314,9 @@ with
 
     //member this.toStringExtended =
     //    match this with
-    //    | RDM rdm           -> if rdm.IsNone then this.toString else $"{this.toString} {rdm.Value.toString}" 
-    //    | Infrastructure i  -> if i.IsNone then this.toString else $"{this.toString} {i.Value.toString}" 
-    //    | Tools t           -> if t.IsNone then this.toString else $"{this.toString} {t.Value.toString}" 
-    //    | Workflows w       -> if w.IsNone then this.toString else $"{this.toString} {w.Value.toString}" 
-    //    | Metadata m        -> if m.IsNone then this.toString else $"{this.toString} {m.Value.toString}" 
+    //    | RDM rdm           -> if rdm.IsNone then this.toString else $"{this.toString} {rdm.Value.toString}"
+    //    | Infrastructure i  -> if i.IsNone then this.toString else $"{this.toString} {i.Value.toString}"
+    //    | Tools t           -> if t.IsNone then this.toString else $"{this.toString} {t.Value.toString}"
+    //    | Workflows w       -> if w.IsNone then this.toString else $"{this.toString} {w.Value.toString}"
+    //    | Metadata m        -> if m.IsNone then this.toString else $"{this.toString} {m.Value.toString}"
     //    | Other             -> "Other"
