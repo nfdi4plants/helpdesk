@@ -28,7 +28,7 @@ sequenceDiagram
     User ->> Frontend: Submit
     Frontend ->> Backend: Submit
     Backend->>MSTeams: Send to task planner
-    create actor DataStewards 
+    create actor DataStewards
     MSTeams ->> DataStewards : Notify
     DataStewards --) DataStewards: Distribute to correct member
     Backend ->> Frontend: Confirm successful submit
@@ -93,23 +93,17 @@ dotnet run -- RunTests
 ```
 ### Docker Publish
 
-Start docker then use: 
-
-```bash 
-dotnet run docker-publish
-```
-
-__OR__
+Start docker then:
 
 <details><summary>Step by step</summary>
 <p>
 
-1. Create image 
+1. Create image
 ```bash
 docker build -t nfdi-helpdesk .
 ```
 
-2. Test image 
+2. Test image
 ```bash
 docker run -it -p 8085:8085 nfdi-helpdesk
 ```
@@ -117,6 +111,7 @@ docker run -it -p 8085:8085 nfdi-helpdesk
 3. Create tag for image
 ```bash
 docker tag nfdi-helpdesk:latest freymaurer/nfdi-helpdesk:X.X.X
+docker tag nfdi-helpdesk:latest freymaurer/nfdi-helpdesk:latest
 ```
 
 Remember to replace "X.X.X" with the correct next SemVer version.
@@ -124,6 +119,7 @@ Remember to replace "X.X.X" with the correct next SemVer version.
 4. Push the image
 ```bash
 docker push freymaurer/nfdi-helpdesk:X.X.X
+docker push freymaurer/nfdi-helpdesk:latest
 ```
 
 </p>

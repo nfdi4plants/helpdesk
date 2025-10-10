@@ -2,16 +2,20 @@
 
 ### Changed
 
-* Navbar to minimal version
-* RELEASE_NOTES.md structure to keep a changelog
+- Navbar to minimal version
+- RELEASE_NOTES.md structure to keep a changelog
 
 ### Deprecated
 
-* Remove nfdi4plants/web-components
+- Remove nfdi4plants/web-components
 
 ### Removed
 
-* Footer component
+- Footer component
+
+### Fixed
+
+- Fix url read logic on `ARC Commander` topic.
 
 ## 1.3.2+ab57292 (Released 2023-7-11)
 * Additions:
